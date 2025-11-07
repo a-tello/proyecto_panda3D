@@ -1,8 +1,8 @@
 from panda3d.core import WindowProperties
 from direct.showbase.ShowBase import ShowBase
-from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu
+from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider
 from direct.actor.Actor import Actor
-
+from panda3d.core import TextNode
 class Juego(ShowBase):
     def __init__(self):
         super().__init__()
@@ -11,7 +11,8 @@ class Juego(ShowBase):
         
         # PANTALLA
         prop_pantalla = WindowProperties()
-        prop_pantalla.setSize(1280,960)
+        prop_pantalla.setSize(800,600)
+        prop_pantalla.set_fullscreen(False)
         self.win.requestProperties(prop_pantalla)
         
         # ENTORNO
@@ -53,15 +54,22 @@ class Juego(ShowBase):
         #                 frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
         # btn.setTransparency(True)
 
-        btn = DirectOptionMenu(text="Resolución de pantalla", pos = (0, 0, 0.2), parent = self.menu_opciones, scale=0.1, initialitem=2,
-                        frameSize = (-4, 4, -1, 1), text_scale = 1, text_pos = (-2, -0.2),
-                        items=["1280 x 960", "1280 x 1024", "800 x 600", 'Fullscreen'], highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1)
+
+        DirectLabel(text = 'Pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu_opciones, 
+                        text_fg = (1, 1, 1, 1), frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2))
+
+        btn = DirectOptionMenu(text="Resolución de pantalla", pos = (.5, 0, 0.2), parent = self.menu_opciones, scale=0.1, initialitem=0,
+                        frameSize = (-4, 4, -1, 1), text_scale = 1.1, text_pos = (0, -0.2), command=self.cambiar_pantalla, text_align=TextNode.ACenter,
+                        items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1)
         btn.setTransparency(True)
         
         
-        btn = DirectButton(text = 'Musica', command = self.menu, pos = (0, 0, -0.2), parent = self.menu_opciones, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
-        btn.setTransparency(True)
+        DirectLabel(text = 'Musica', scale = 0.1, pos = (-.5, 0, -0.2), parent = self.menu_opciones, 
+                        text_fg = (1, 1, 1, 1),frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2))
+        self.volumen = DirectSlider(range=(0,100), value=100, pos = (.5, 0, -0.2), pageSize=3, command=self.musica, scale=0.5, parent=self.menu_opciones)
+        # btn = DirectButton(text = 'Musica', command = self.menu, pos = (.5, 0, -0.2), parent = self.menu_opciones, scale = 0.1, 
+        #                 frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        # btn.setTransparency(True)
 
         btn = DirectButton(text = 'Volver al menú', command = self.menu, pos = (0, 0, -0.6), parent = self.menu_opciones, scale = 0.1, 
                         frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
@@ -72,15 +80,25 @@ class Juego(ShowBase):
     def jugar(self):
         self.menu_fondo.hide()
         self.menu_inicio.hide()
+        
     def menu(self):
         self.menu_opciones.hide()
         self.menu_inicio.show()
+        
     def opciones(self):
         self.menu_inicio.hide()
         self.menu_opciones.show()
+        
+    def cambiar_pantalla(self, op):
+        ancho, alto = op.split(' x ')
+        prop_pantalla = WindowProperties()
+        prop_pantalla.setSize(int(ancho), int(alto))
+        self.win.requestProperties(prop_pantalla)
+        
     def salir(self):
         self.userExit()
 
-
+    def musica(self):
+        print(self.volumen['value'])
 juego = Juego()
 juego.run()
