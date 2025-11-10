@@ -1,4 +1,5 @@
 from menu import MenuPrincipal, MenuOpciones
+from personaje import Personaje
 
 from panda3d.core import WindowProperties
 
@@ -10,31 +11,37 @@ class Juego(ShowBase):
     def __init__(self):
         super().__init__()
         
-        self.disableMouse()
-        
         # PANTALLA
         self.pantalla = WindowProperties()
         self.pantalla.setSize(800,600)
         self.pantalla.set_fullscreen(False)
         self.win.requestProperties(self.pantalla)
         
-        # ENTORNO
-        self.entorno = self.loader.loadModel('assets/Environment/environment')
-        self.entorno.reparentTo(self.render) 
-
-        self.personaje = Actor('assets/models/act_p3d_chan')
-        self.personaje.setPos(0, 5, 0)
-        self.personaje.reparentTo(self.render) 
-
-
         # MENU
         self.menu_principal = MenuPrincipal(self)
         self.menu_opciones = MenuOpciones(self)
         self.menu_opciones.esconder_menu()
 
+        # ENTORNO
+        self.entorno = self.loader.loadModel('assets/Environment/environment')
+        self.entorno.reparentTo(self.render) 
+
+        # CAMARA
+        self.disableMouse()
+
+
+        # JUGADOR
+        self.jugador = Personaje(self)
+
+    def actualizar(self, task):
+        dt = globalClock.getDt()
+        self.jugador.mover(dt)
+
+        return task.cont
 
     def jugar(self):
         self.menu_principal.esconder_menu()
+        self.taskMgr.add(self.actualizar, 'actualizar')
 
         
     def menu(self):
@@ -54,10 +61,12 @@ class Juego(ShowBase):
         self.pantalla.set_fullscreen(opcion)
         self.win.requestProperties(self.pantalla)
 
+    def musica(self):
+        print(self.menu_opciones.volumen['value'])
+
     def salir(self):
         self.userExit()
 
-    def musica(self):
-        print(self.menu_opciones.volumen['value'])
+
 juego = Juego()
 juego.run()
