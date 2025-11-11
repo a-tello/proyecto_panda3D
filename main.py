@@ -26,8 +26,6 @@ class Juego(ShowBase):
         self.menu_opciones.esconder_menu()
 
         # ENTORNO
-        # self.entorno = self.loader.loadModel('assets/Environment/environment')
-        # self.entorno.reparentTo(self.render) 
         self.mapa = Nivel(self)
 
         # ILUMINACION
@@ -42,11 +40,9 @@ class Juego(ShowBase):
         # CAMARA
         self.disableMouse()
 
-
         # JUGADOR
         self.jugador = Personaje(self)
         self.enemigo = Enemigo(self)
-
 
         # COLISIONES
         self.traverser = CollisionTraverser()
