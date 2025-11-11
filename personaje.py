@@ -2,8 +2,9 @@ import math
 import random
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode
+from panda3d.core import CollisionSphere, CollisionNode, CollisionRay, CollisionHandlerQueue
 from panda3d.core import BitMask32
+from panda3d.core import Point2, Point3, Vec3
 
 
 class Personaje():
@@ -16,7 +17,7 @@ class Personaje():
         self.personaje.setPos(6, 6, 0)
         self.personaje.getChild(0).setH(180)
         self.personaje.reparentTo(self.juego.render)
-        self.personaje.loop("stand")
+        self.personaje.loop('stand')
 
 
         # ATRIBUTOS
@@ -53,11 +54,54 @@ class Personaje():
         self.sensibilidad_mouse = 0.3
 
         # COLISION
-        colliderNode = CollisionNode("personaje")
+        colliderNode = CollisionNode('personaje')
         colliderNode.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colision = self.personaje.attachNewNode(colliderNode)
         self.colision.show()
-           
+        
+        
+        
+        # DISPAROS
+        # self.bala = CollisionRay(0, 0, 0, 0, 1, 0)
+        # bala_nodo = CollisionNode('bala')
+        # bala_nodo.addSolid(self.bala)
+        
+        # self.bala_np = juego.render.attachNewNode(bala_nodo)
+        # self.bala_np.setPos(self.juego.cam, 0, 0, 1.5)
+        # self.bala_np.setQuat(self.juego.cam.getQuat(render))
+        # self.bala_lista = CollisionHandlerQueue()
+        
+        # self.juego.traverser.addCollider(self.bala_np, self.bala_lista)
+        
+        
+        
+        
+        
+        # mask = BitMask32()
+        # mask.setBit(1)
+
+        # self.colision.node().setIntoCollideMask(mask)
+
+        # mask = BitMask32()
+        # mask.setBit(1)
+
+        # self.colision.node().setFromCollideMask(mask)
+
+        # mask = BitMask32()
+        # mask.setBit(2)
+        # bala_nodo.setFromCollideMask(mask)
+
+        # mask = BitMask32()
+        # bala_nodo.setIntoCollideMask(mask)
+        
+        
+        # self.bala_modelo = self.juego.loader.loadModel('assets/laser/bambooLaser')
+        # self.bala_modelo.reparentTo(self.personaje)
+        # self.bala_modelo.setZ(1.5)
+        # self.bala_modelo.setLightOff()
+        # self.bala_modelo.hide()
+        self.balas_activas = []
+        self.cooldown = 0
 
 
     def actualizar_tecla(self, tecla, estado):
@@ -106,7 +150,7 @@ class Personaje():
             self.personaje.setH(math.degrees(math.atan2(-distancia.x, distancia.y)))
         else:
             self.personaje.setH(self.angulo_horizontal)
-
+            
         self.movimiento_camara()
 
         if self.movimiento:
@@ -122,9 +166,62 @@ class Personaje():
             animacion_quieto = self.personaje.getAnimControl('stand')
             if animacion_quieto and not animacion_quieto.isPlaying():
                 self.personaje.stop('walk')
-                self.personaje.loop('stand')
-        
+                self.personaje.loop('stand')  
+                
+                
+        if self.teclas['disparar'] and self.cooldown <= 0:                              
+        #     if self.bala_lista.getNumEntries() > 0:
+        #         self.bala_lista.sortEntries()
+        #         impacto = self.bala_lista.getEntry(0)
+        #         hitPos = impacto.getSurfacePoint(self.juego.render)
 
+        #         hitNodePath = impacto.getIntoNodePath()
+        #         print (hitNodePath)
+        #         if hitNodePath.hasPythonTag('owner'):
+        #             hitObject = hitNodePath.getPythonTag('owner')
+        #             hitObject.alterHealth(5*dt)
+
+                
+        #         beamLength = (hitPos - self.personaje.getPos()).length()
+        #         self.bala_modelo.setSy(beamLength)
+
+        #         self.bala_modelo.show()
+        # else:
+        #     self.bala_modelo.hide()
+        
+            bala = loader.loadModel('assets/laser/bambooLaser')   
+            bala.setScale(2)
+            bala.reparentTo(self.juego.render)
+            bala.setPos(self.personaje.getPos())     
+            bala.setHpr(self.personaje.getHpr())    
+
+            self.balas_activas.append({'modelo': bala, 'velocidad': 50})
+            print(self.balas_activas,"\n")
+            self.cooldown = 0.3  
+        
+        for bala in self.balas_activas:
+            modelo = bala['modelo']
+            modelo.setY(modelo, bala['velocidad'] * dt)  
+
+            bala_nodo = modelo.attachNewNode(CollisionNode('bala'))
+            bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.2))
+            bala_nodo.node().setFromCollideMask(BitMask32.bit(1))
+            bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
+            self.juego.traverser.traverse(self.juego.render)
+            
+        for bala in self.balas_activas[:]:
+            modelo = bala['modelo']
+            modelo.setY(modelo, bala['velocidad'] * dt)
+
+            # Chequear distancia
+            if (modelo.getPos() - self.personaje.getPos()).length() > 200:
+                modelo.removeNode()
+                self.balas_activas.remove(bala)
+            
+        if self.cooldown > 0:
+            self.cooldown -= dt
+                    
+    
     def movimiento_camara(self):
         personaje_pos = self.personaje.getPos()
         self.juego.camera.setPos(personaje_pos + Vec3(0, 0, 1.2))
@@ -134,12 +231,13 @@ class Personaje():
 
 
 class Enemigo():
-    def __init__(self, juego):
+    def __init__(self, spawn, juego):
         self.juego = juego
         self.objetivo = self.juego.jugador.personaje
         self.zombie = Actor('assets/models/monkey')
         self.zombie.reparentTo(juego.render)
-        self.zombie.setPos(60,10,0)
+        self.zombie.setPos(spawn)
+        self.zombie.setScale(.5)
         
         # ATRIBUTOS
         self.vida = 100
@@ -149,6 +247,16 @@ class Enemigo():
         # MOVIMIENTO RANDOM
         self.direccion_random = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
         self.direccion_random.normalize()
+        
+        # COLISION
+        colliderNode = CollisionNode('enemigo')
+        colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
+        self.colision = self.zombie.attachNewNode(colliderNode)
+        self.colision.node().setFromCollideMask(BitMask32.bit(2))
+        self.colision.node().setIntoCollideMask(BitMask32.bit(1))
+        
+        juego.pusher.addCollider(self.colision, self.zombie)
+        juego.traverser.addCollider(self.colision, juego.pusher)
 
 
     def mover(self, dt):

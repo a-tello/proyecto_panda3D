@@ -1,5 +1,5 @@
 import random
-from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3
+from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, BitMask32
 from PIL import Image
 
 class Nivel():
@@ -15,7 +15,6 @@ class Nivel():
         mapa = Image.open(imagen).convert('L')
         ancho, alto = mapa.size
         
-        matriz = []
         for y in range(alto):
             fila = []
             for x in range(ancho):
@@ -24,9 +23,9 @@ class Nivel():
                     fila.append(1)
                 else:  
                     fila.append(0)
-            matriz.append(fila)
+            self.mapa.append(fila)
         
-        self.crear_escenario(matriz)
+        self.crear_escenario(self.mapa)
 
 
     def crear_escenario(self, matriz):
@@ -63,6 +62,8 @@ class Nivel():
     def agregar_colision(self, nodo):
         nodo_colision = CollisionNode('pared')
         nodo_colision.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 0.5, 0.5, 0.5))
+        nodo_colision.setFromCollideMask(BitMask32.allOff())
+        nodo_colision.setIntoCollideMask(BitMask32.bit(2))
         nc_path = nodo.attachNewNode(nodo_colision)
         nc_path.show()
 
