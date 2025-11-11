@@ -1,12 +1,15 @@
 from menu import MenuPrincipal, MenuOpciones
-from personaje import Personaje
-
+from personaje import Personaje, Enemigo
+from nivel import Nivel
 from panda3d.core import WindowProperties
 
 
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton
+from panda3d.core import AmbientLight, DirectionalLight
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher
 from direct.actor.Actor import Actor
+
 class Juego(ShowBase):
     def __init__(self):
         super().__init__()
@@ -23,8 +26,18 @@ class Juego(ShowBase):
         self.menu_opciones.esconder_menu()
 
         # ENTORNO
-        self.entorno = self.loader.loadModel('assets/Environment/environment')
-        self.entorno.reparentTo(self.render) 
+        # self.entorno = self.loader.loadModel('assets/Environment/environment')
+        # self.entorno.reparentTo(self.render) 
+        self.mapa = Nivel(self)
+
+        # ILUMINACION
+        ambient = AmbientLight('ambient')
+        ambient.setColor((0.5, 0.5, 0.5, 1))
+        self.render.setLight(self.render.attachNewNode(ambient))
+
+        dlight = DirectionalLight('dlight')
+        dlight.setColor((1, 1, 1, 1))
+        self.render.setLight(self.render.attachNewNode(dlight))
 
         # CAMARA
         self.disableMouse()
@@ -32,11 +45,21 @@ class Juego(ShowBase):
 
         # JUGADOR
         self.jugador = Personaje(self)
+        self.enemigo = Enemigo(self)
+
+
+        # COLISIONES
+        self.traverser = CollisionTraverser()
+        self.pusher = CollisionHandlerPusher()
+        self.pusher.addCollider(self.jugador.colision, self.jugador.personaje)
+        self.traverser.addCollider(self.jugador.colision, self.pusher)
+        self.pusher.setHorizontal(True)
 
     def actualizar(self, task):
-        dt = globalClock.getDt()
+        dt = self.clock.getDt()
         self.jugador.mover(dt)
-
+        self.enemigo.mover(dt)
+        self.traverser.traverse(self.render)
         return task.cont
 
     def jugar(self):
