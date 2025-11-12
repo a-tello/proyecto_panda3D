@@ -13,7 +13,7 @@ class Personaje():
         self.juego = juego
         self.personaje = Actor('assets/models/act_p3d_chan', {
                             'stand' : 'assets/models/a_p3d_chan_idle',
-                            'walk' : 'assets/models/a_p3d_chan_walk'
+                            'run' : 'assets/models/a_p3d_chan_run'
                         })
         self.personaje.setPos(6, 6, 0)
         self.personaje.getChild(0).setH(180)
@@ -113,16 +113,17 @@ class Personaje():
         self.iconos_vida_false = []
         for i in range(self.vida):
             vida_img_true = OnscreenImage(image = "vida_completa.png",
-                                pos = (-1.275 + i*0.075, 0, 0.95))
+                                pos = (-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
                                 
-            # vida_img_false = OnscreenImage(image = "vida_vacia.png",
-            #                     pos = (-1.275 + i*0.075, 0, 0.95),
-            #                     scale = 0.04)
+            vida_img_false = OnscreenImage(image = "vida_vacia.png",
+                                pos=(-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
             
             vida_img_true.setTransparency(True)
-            #vida_img_false.setTransparency(True)
+            vida_img_false.setTransparency(True)
+            vida_img_true.hide()
+            vida_img_false.hide()
             self.iconos_vida_true.append(vida_img_true)
-            #self.iconos_vida_false.append(vida_img_false)
+            self.iconos_vida_false.append(vida_img_false)
                 
 
     def actualizar_tecla(self, tecla, estado):
@@ -130,14 +131,14 @@ class Personaje():
 
     def actualizar_vida(self):
         for i, icono in enumerate(self.iconos_vida_true):
-            if i < self.vida:
+            if i < 7:
                 print('si')
                 icono.show()
             else:
                 self.iconos_vida_false[i].show()
 
     def mover(self, dt):
-        #self.actualizar_vida()
+        self.actualizar_vida()
         # MOVIMIENTO CAMARA
         if self.juego.mouseWatcherNode.hasMouse():
             x = self.juego.win.getPointer(0).getX()
@@ -191,17 +192,17 @@ class Personaje():
         # ANIMACION
         if self.movimiento:
             animacion_quieto = self.personaje.getAnimControl('stand')
-            animacion_caminar = self.personaje.getAnimControl('walk')
+            animacion_caminar = self.personaje.getAnimControl('run')
 
             if animacion_quieto and animacion_quieto.isPlaying():
                 animacion_quieto.stop()
 
             if animacion_caminar and not animacion_caminar.isPlaying():
-                self.personaje.loop('walk')
+                self.personaje.loop('run')
         else:
             animacion_quieto = self.personaje.getAnimControl('stand')
             if animacion_quieto and not animacion_quieto.isPlaying():
-                self.personaje.stop('walk')
+                self.personaje.stop('run')
                 self.personaje.loop('stand')  
                 
                 

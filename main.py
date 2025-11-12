@@ -9,6 +9,8 @@ from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectO
 from panda3d.core import AmbientLight, DirectionalLight
 from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent
 from direct.actor.Actor import Actor
+from panda3d.core import CardMaker, NodePath, TexturePool, TransparencyAttrib
+
 
 class Juego(ShowBase):
     def __init__(self):
@@ -65,9 +67,30 @@ class Juego(ShowBase):
         self.intervalo_spawn = 2
         self.temporizador_spawn = 2
         
+        # TEST CARDMAKER
+        cm = CardMaker("myCard")
+
+
+        self.card_np = render.attach_new_node(cm.generate())
+
+        tex = TexturePool.load_texture("z-Photoroom.png")
+
+        self.card_np.set_texture(tex)
+        self.card_np.setPos(7, 7, 0) 
+        self.card_np.setScale(2)
+#        self.card_np.reparentTo(render)
+        self.card_np.setTransparency(TransparencyAttrib.MAlpha)
+        #self.card_np.setBillboardPointEye()
+        self.card_np.setTwoSided(True)
+        
+                
+        
+
 
     def actualizar(self, task):
         dt = self.clock.getDt()
+        self.card_np.lookAt(self.jugador.personaje)
+        
         self.jugador.mover(dt)
         
         self.temporizador_spawn -= dt
