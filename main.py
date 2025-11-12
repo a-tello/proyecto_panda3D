@@ -1,6 +1,6 @@
 from menu import MenuPrincipal, MenuOpciones
 from personaje import Personaje, Enemigo
-from nivel import Nivel
+from nivel import Laberinto, MapaImagen
 from panda3d.core import WindowProperties, Vec3
 import random
 
@@ -26,7 +26,8 @@ class Juego(ShowBase):
         self.menu_opciones.esconder_menu()
 
         # ENTORNO
-        self.mapa = Nivel(self)
+        self.mapa = MapaImagen(self, 'assets/maps/lvl1.png')
+        #self.mapa = Laberinto(self)
 
         # ILUMINACION
         ambient = AmbientLight('ambient')
@@ -39,25 +40,22 @@ class Juego(ShowBase):
 
         # CAMARA
         self.disableMouse()
-        self.cam.setPos(0, -2, 1)  
-        self.cam.node().getLens().setFov(80)
 
 
         # COLISIONES
-        self.traverser = CollisionTraverser()
+        self.cTrav = CollisionTraverser()
         self.pusher = CollisionHandlerPusher()
         
         self.cHandler = CollisionHandlerEvent()
         self.cHandler.addInPattern('%fn-into-%in')
-        self.traverser.setRespectPrevTransform(True)
+        self.cTrav.setRespectPrevTransform(True)
         
         
         # JUGADOR
         self.jugador = Personaje(self)
         
-        self.pusher.addCollider(self.jugador.colision, self.jugador.personaje)
-        self.traverser.addCollider(self.jugador.colision, self.pusher)
-        self.pusher.setHorizontal(True)
+        self.pusher.addCollider(self.jugador.colisionador, self.jugador.personaje)
+        self.cTrav.addCollider(self.jugador.colisionador, self.pusher)
         
         # ENEMIGOS
         self.enemigos = []
@@ -80,11 +78,13 @@ class Juego(ShowBase):
         for enemigo in self.enemigos:
             enemigo.mover(dt)
         
-        self.traverser.traverse(self.render)
+        self.cTrav.traverse(self.render)
         return task.cont
 
     def jugar(self):
         self.menu_principal.esconder_menu()
+        self.pantalla.setCursorHidden(True)
+        self.win.requestProperties(self.pantalla)
         self.buscar_spawns()
         self.taskMgr.add(self.actualizar, 'actualizar')
 
@@ -95,8 +95,8 @@ class Juego(ShowBase):
 
         for y in range(alto):
             for x in range(ancho):
-                if self.mapa.mapa[y][x] == 1:
-                    self.spawn_points.append(Vec3(x, y, 3))
+                if self.mapa.mapa[y][x] == 0:
+                    self.spawn_points.append(Vec3(x, y, 1))
     
     def spawnear_enemigo(self):
         if len(self.enemigos) < self.enemigos_max:
@@ -105,7 +105,6 @@ class Juego(ShowBase):
 
             self.enemigos.append(enemigo)
           
-    
     def menu(self):
         self.menu_opciones.esconder_menu()
         self.menu_principal.mostrar_menu()

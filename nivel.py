@@ -2,33 +2,16 @@ import random
 from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, BitMask32
 from PIL import Image
 
+
 class Nivel():
     def __init__(self, juego):
         self.juego = juego
-
-        # MAPA
         self.mapa = []
-        self.cargar_matriz_imagen('assets/maps/lvl1.png')
-
-        
-    def cargar_matriz_imagen(self, imagen):
-        mapa = Image.open(imagen).convert('L')
-        ancho, alto = mapa.size
-        
-        for y in range(alto):
-            fila = []
-            for x in range(ancho):
-                pixel = mapa.getpixel((x, y))
-                if pixel < 128: 
-                    fila.append(1)
-                else:  
-                    fila.append(0)
-            self.mapa.append(fila)
-        
-        self.crear_escenario(self.mapa)
-
-
+    
     def crear_escenario(self, matriz):
+        
+        # TODO funcion
+        
         pared = self.juego.loader.loadModel('models/box')
         pared.setScale(1, 1, 3)
         textura_pared = self.juego.loader.loadTexture('assets/Environment/tex/pared.jpg')
@@ -50,35 +33,50 @@ class Nivel():
 
         for y in range(alto):
             for x in range(ancho):
+                cubo_piso = piso.copyTo(mapa_np)
+                cubo_piso.setPos(x,y,-1)
                 if matriz[y][x] == 1:
                     cubo_pared = pared.copyTo(mapa_np)
-                    cubo_pared.setPos(x, y, 0)
                     self.agregar_colision(cubo_pared)
-                else:
-                    cubo_piso = piso.copyTo(mapa_np)
-                    cubo_piso.setPos(x,y,-1)
+                    cubo_pared.setPos(x, y, 0)
 
-        
     def agregar_colision(self, nodo):
         nodo_colision = CollisionNode('pared')
         nodo_colision.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 0.5, 0.5, 0.5))
-        nodo_colision.setFromCollideMask(BitMask32.allOff())
-        nodo_colision.setIntoCollideMask(BitMask32.bit(2))
+        # nodo_colision.setFromCollideMask(BitMask32.allOff())
+        # nodo_colision.setIntoCollideMask(BitMask32.bit(2))
         nc_path = nodo.attachNewNode(nodo_colision)
         nc_path.show()
 
 
+class MapaImagen(Nivel):
+    def __init__(self, juego, imagen):
+        super().__init__(juego)
+
+        self.cargar_matriz_imagen(imagen)
+
+    def cargar_matriz_imagen(self, imagen):
+        mapa = Image.open(imagen).convert('L')
+        ancho, alto = mapa.size
+        
+        for y in range(alto):
+            fila = []
+            for x in range(ancho):
+                pixel = mapa.getpixel((x, y))
+                if pixel < 128: 
+                    fila.append(1)
+                else:  
+                    fila.append(0)
+            self.mapa.append(fila)
+        
+        self.crear_escenario(self.mapa)
 
 
-
-
-
-
-class Laberinto():
-    def __init__(self, ancho=30, alto=30):
+class Laberinto(Nivel):
+    def __init__(self, juego, ancho=10, alto=10):
+        super().__init__(juego)
         self.ancho = ancho
         self.alto = alto
-        self.laberinto = []
         self.spawn = (1, 1)
         self.salida = ()
         self.generar_matriz()
@@ -96,8 +94,8 @@ class Laberinto():
             fila = []
             for y in range(self.alto):
                 fila.append(1)
-            self.matriz.append(fila)
-        self.matriz[1][1] = 0
+            self.mapa.append(fila)
+        self.mapa[1][1] = 0
         self.generar_laberinto(1, 1)
         self.salida = (self.alto-2, self.ancho-1)
 
@@ -107,10 +105,12 @@ class Laberinto():
         for dx, dy in direcciones:
             nx, ny = x + dx, y + dy
             if 0 < nx < self.ancho-1 and 0 < ny < self.alto-1:
-                if self.matriz[ny][nx] == 1:
-                    self.matriz[ny - dy//2][nx - dx//2] = 0
-                    self.matriz[ny][nx] = 0
+                if self.mapa[ny][nx] == 1:
+                    self.mapa[ny - dy//2][nx - dx//2] = 0
+                    self.mapa[ny][nx] = 0
                     self.generar_laberinto(nx, ny)
+        
+        self.crear_escenario(self.mapa)
 
     # def mostrar(self):
     #     print('Entrada:', self.spawn)

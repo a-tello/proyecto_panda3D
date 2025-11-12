@@ -5,6 +5,7 @@ from panda3d.core import Vec3
 from panda3d.core import CollisionSphere, CollisionNode, CollisionRay, CollisionHandlerQueue
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3
+from direct.gui.OnscreenImage import OnscreenImage
 
 
 class Personaje():
@@ -19,9 +20,8 @@ class Personaje():
         self.personaje.reparentTo(self.juego.render)
         self.personaje.loop('stand')
 
-
         # ATRIBUTOS
-        self.vida = 100
+        self.vida = 10
         self.velocidad = 5
         self.ataque = 20
 
@@ -43,23 +43,27 @@ class Personaje():
 
 
         # CAMARA 
+
+
+        # juego.cam.setPos(0, -2, 20)
+        # juego.cam.setP(-90)
         juego.cam.setPos(0, -2, 1)  
         juego.cam.node().getLens().setFov(80)
         self.angulo_horizontal = 0  
         self.angulo_vertical = 0  
-        self.ultimo_mouse_x = 0
-        self.ultimo_mouse_y = 0
+        self.ultimo_x = self.juego.win.getPointer(0).getX()
+        self.ultimo_Y = self.juego.win.getPointer(0).getY()
         self.velocidad = 5
         self.velocidad_rotacion = 120.0
         self.sensibilidad_mouse = 0.3
 
         # COLISION
-        colliderNode = CollisionNode('personaje')
-        colliderNode.addSolid(CollisionSphere(0, 0, 1, .3))
-        self.colision = self.personaje.attachNewNode(colliderNode)
-        self.colision.show()
+        cn_jugador = CollisionNode('personaje')
+        cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
+        self.colisionador = self.personaje.attachNewNode(cn_jugador)
+        self.colisionador.show()
         
-        
+
         
         # DISPAROS
         # self.bala = CollisionRay(0, 0, 0, 0, 1, 0)
@@ -71,7 +75,7 @@ class Personaje():
         # self.bala_np.setQuat(self.juego.cam.getQuat(render))
         # self.bala_lista = CollisionHandlerQueue()
         
-        # self.juego.traverser.addCollider(self.bala_np, self.bala_lista)
+        # self.juego.cTrav.addCollider(self.bala_np, self.bala_lista)
         
         
         
@@ -102,26 +106,60 @@ class Personaje():
         # self.bala_modelo.hide()
         self.balas_activas = []
         self.cooldown = 0
+        
 
+
+        self.iconos_vida_true = []
+        self.iconos_vida_false = []
+        for i in range(self.vida):
+            vida_img_true = OnscreenImage(image = "vida_completa.png",
+                                pos = (-1.275 + i*0.075, 0, 0.95))
+                                
+            # vida_img_false = OnscreenImage(image = "vida_vacia.png",
+            #                     pos = (-1.275 + i*0.075, 0, 0.95),
+            #                     scale = 0.04)
+            
+            vida_img_true.setTransparency(True)
+            #vida_img_false.setTransparency(True)
+            self.iconos_vida_true.append(vida_img_true)
+            #self.iconos_vida_false.append(vida_img_false)
+                
 
     def actualizar_tecla(self, tecla, estado):
         self.teclas[tecla] = estado
 
+    def actualizar_vida(self):
+        for i, icono in enumerate(self.iconos_vida_true):
+            if i < self.vida:
+                print('si')
+                icono.show()
+            else:
+                self.iconos_vida_false[i].show()
+
     def mover(self, dt):
+        #self.actualizar_vida()
+        # MOVIMIENTO CAMARA
         if self.juego.mouseWatcherNode.hasMouse():
-            mouse_x = self.juego.mouseWatcherNode.getMouseX()
-            mouse_y = self.juego.mouseWatcherNode.getMouseY()
+            x = self.juego.win.getPointer(0).getX()
+            y = self.juego.win.getPointer(0).getY()
 
-            if mouse_x or mouse_y:
-                self.angulo_horizontal -= mouse_x * self.sensibilidad_mouse * 100
-                self.angulo_vertical += mouse_y * self.sensibilidad_mouse * 100
-                
-                self.angulo_vertical = max(-90, min(90, self.angulo_vertical))
-                self.juego.win.movePointer(0, self.juego.win.getXSize()//2, self.juego.win.getYSize()//2)
+            delta_x = x - self.ultimo_x
+            delta_y = y - self.ultimo_Y
 
-            self.ultimo_mouse_x = mouse_x
-            self.ultimo_mouse_y = mouse_y
+            self.angulo_horizontal = self.personaje.getH() - delta_x * self.sensibilidad_mouse
+            self.angulo_vertical += -delta_y * self.sensibilidad_mouse * self.sensibilidad_mouse
+            self.angulo_vertical = max(-90, min(90, self.angulo_vertical))
+            self.juego.win.movePointer(0, self.juego.win.getXSize()//2, self.juego.win.getYSize()//2)
 
+            winX = int(self.juego.win.getXSize() / 2)
+            winY = int(self.juego.win.getYSize() / 2)
+            self.juego.win.movePointer(0, winX, winY)
+
+            self.ultimo_x = self.juego.win.getPointer(0).getX()
+            self.ultimo_Y = self.juego.win.getPointer(0).getY()
+
+
+        # MOVIMIENTO PERSONAJE
         rad = math.radians(self.angulo_horizontal)
         movimiento_adelante = Vec3(-math.sin(rad), math.cos(rad), 0)
         movimiento_derecha = Vec3(math.cos(rad), math.sin(rad), 0)
@@ -144,15 +182,13 @@ class Personaje():
 
         if distancia.length() > 0:
             distancia.normalize()
-            # vel_actual = self.velocidad * (2 if teclas['shift'] else 1) CORRER
             self.personaje.setPos(self.personaje.getPos() + distancia * dt * self.velocidad)
 
-            self.personaje.setH(math.degrees(math.atan2(-distancia.x, distancia.y)))
-        else:
-            self.personaje.setH(self.angulo_horizontal)
-            
+        # GIRAR PERSONAJE Y CAMARA
+        self.personaje.setH(self.angulo_horizontal)
         self.movimiento_camara()
 
+        # ANIMACION
         if self.movimiento:
             animacion_quieto = self.personaje.getAnimControl('stand')
             animacion_caminar = self.personaje.getAnimControl('walk')
@@ -207,13 +243,12 @@ class Personaje():
             bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.2))
             bala_nodo.node().setFromCollideMask(BitMask32.bit(1))
             bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
-            self.juego.traverser.traverse(self.juego.render)
+            self.juego.cTrav.traverse(self.juego.render)
             
         for bala in self.balas_activas[:]:
             modelo = bala['modelo']
             modelo.setY(modelo, bala['velocidad'] * dt)
 
-            # Chequear distancia
             if (modelo.getPos() - self.personaje.getPos()).length() > 200:
                 modelo.removeNode()
                 self.balas_activas.remove(bala)
@@ -252,15 +287,16 @@ class Enemigo():
         colliderNode = CollisionNode('enemigo')
         colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
         self.colision = self.zombie.attachNewNode(colliderNode)
-        self.colision.node().setFromCollideMask(BitMask32.bit(2))
-        self.colision.node().setIntoCollideMask(BitMask32.bit(1))
+        # self.colision.node().setFromCollideMask(BitMask32.bit(2))
+        # self.colision.node().setIntoCollideMask(BitMask32.bit(1))
         
         juego.pusher.addCollider(self.colision, self.zombie)
-        juego.traverser.addCollider(self.colision, juego.pusher)
+        juego.cTrav.addCollider(self.colision, juego.pusher)
 
 
     def mover(self, dt):
         direccion_objetivo = self.objetivo.getPos() - self.zombie.getPos()
+        direccion_objetivo.setZ(0)
         distancia = direccion_objetivo.length()
 
         avance = self.zombie.getPos() + self.direccion_random * self.velocidad * dt
