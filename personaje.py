@@ -66,35 +66,25 @@ class Personaje():
         cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
+        cn_jugador.setFromCollideMask(BitMask32.bit(1))
+        cn_jugador.setIntoCollideMask(BitMask32.bit(1))
 
-        #  MASCARA DE COLIISON (contra enemigos y paredes)
-        self.colisionador.node().setFromCollideMask(BIT_PAREDES | BIT_ENEMIGOS)
-        self.colisionador.node().setIntoCollideMask(BIT_JUGADOR)
-#        self.colisionador.node().setFromCollideMask(BitMask32.allOff())
+        self.juego.pusher.addCollider(self.colisionador, self.personaje)
+        self.juego.cTrav.addCollider(self.colisionador, self.juego.pusher)
 
-        self.personaje_pusher = CollisionHandlerPusher()
-        self.personaje_pusher.addCollider(self.colisionador, self.personaje)
-        #juego.pusher.addCollider(self.colisionador, self.personaje)
-        #juego.cTrav.addCollider(self.colisionador, juego.pusher)
-        juego.cTrav.addCollider(self.colisionador, self.personaje_pusher)
-        
         
         # COLISION (con NPCs y objetos)
         cn_jugador_obj = CollisionNode('personaje_obj')
         cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador_obj = self.personaje.attachNewNode(cn_jugador_obj)
-        self.colisionador_obj.node().setFromCollideMask(BIT_NPCs | BIT_OBJETOS)
-        self.colisionador_obj.node().setIntoCollideMask(BIT_ENEMIGOS)
+        self.colisionador_obj.setPythonTag('owner', self)
+        cn_jugador_obj.setFromCollideMask(BitMask32.bit(2))
+        cn_jugador_obj.setIntoCollideMask(BitMask32.allOff())
 
-        juego.cTrav.addCollider(self.colisionador_obj, juego.cHandler)
+        self.juego.cTrav.addCollider(self.colisionador_obj, self.juego.cHandler)
         
         # PUNTAJE
-        self.scoreUI = OnscreenText(text = '0',
-                            pos = (-1.28, .75),
-                            mayChange = True,
-                            scale=.1,
-                            fg=(255,255,255,255),
-                            align = TextNode.ALeft)
+        self.puntaje_pantalla = OnscreenText(text = '0', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
         
         # DISPAROS
@@ -169,6 +159,10 @@ class Personaje():
                 icono.show()
             else:
                 self.iconos_vida_false[i].show()
+
+    def actualizar_puntos(self, puntos):
+        self.puntaje += puntos
+        self.puntaje_pantalla.setText(str(self.puntaje))
 
     def mover(self, dt):
         self.actualizar_vida(0)

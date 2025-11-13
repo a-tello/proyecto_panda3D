@@ -21,15 +21,9 @@ class Vecino():
         cn_vecino = CollisionNode(nombre)
         cn_vecino.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador = self.vecino.attachNewNode(cn_vecino)
-        self.colisionador.setPythonTag('owner', self)
-        self.colisionador.show()
 
-        # MASCARA DE COLIISON
-        self.colisionador.node().setIntoCollideMask(BIT_NPCs)
-        self.colisionador.node().setFromCollideMask(BIT_JUGADOR)
-
-        # juego.pusher.addCollider(self.colisionador, self.personaje)
-        #juego.cTrav.addCollider(self.colisionador, juego.cHandler)
+        juego.pusher.addCollider(self.colisionador, self.vecino)
+        juego.cTrav.addCollider(self.colisionador, juego.cHandler)
         
         self.puntos = 1000
         

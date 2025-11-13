@@ -33,31 +33,21 @@ class Enemigo():
         colliderNode = CollisionNode('enemigo')
         colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
         self.colisionador = self.zombie.attachNewNode(colliderNode)
-        self.colisionador.setPythonTag('owner', self)
-        # mascara = BitMask32()
-        # mascara.setBit(2)
-        self.colisionador.node().setIntoCollideMask(BIT_PAREDES | BIT_ENEMIGOS | BIT_JUGADOR)
-        self.colisionador.node().setFromCollideMask(BIT_ENEMIGOS)
-        # self.colisionador.node().setFromCollideMask(BitMask32.bit(2))
-        # self.colisionador.node().setIntoCollideMask(BitMask32.bit(1))
-        
-        self.juego.zombie_pusher(self.colisionador, self.zombie)
-        juego.cTrav.addCollider(self.colisionador, juego.zombie_pusher)
-        #juego.pusher.addCollider(self.colisionador, self.zombie)
-        #juego.cTrav.addCollider(self.colisionador, juego.pusher)
+        self.colisionador.node().setIntoCollideMask(BitMask32().bit(2))
+
+        self.juego.pusher.addCollider(self.colisionador, self.zombie)
+        self.juego.cTrav.addCollider(self.colisionador, self.juego.pusher)
+
 
         # COLISION DE ATAQUE (nodo)
         self.ataque = CollisionSegment(0,0,0,1,0,0)
         ataque_nodo = CollisionNode('ataque')
         ataque_nodo.addSolid(self.ataque)
         # MASCARA DE COLISION (para no atacar a otros enemigos)
-        # mascara_ataque = BitMask32()
-        # mascara_ataque.setBit(1)
-        ataque_nodo.setFromCollideMask(BIT_JUGADOR)
+        ataque_nodo.setFromCollideMask(BitMask32().bit(1))
         ataque_nodo.setIntoCollideMask(BitMask32().allOff())
 
         self.ataque_np = juego.render.attachNewNode(ataque_nodo)
-        self.ataque_np.show()
         self.lista_ataques = CollisionHandlerQueue()
 
         juego.cTrav.addCollider(self.ataque_np, self.lista_ataques)
@@ -84,7 +74,6 @@ class Enemigo():
                 self.delay_ataque -= dt
                 if self.delay_ataque <= 0:
                     if self.lista_ataques.getNumEntries() > 0:
-                        print('Ataque')
                         self.lista_ataques.sortEntries()
                         impacto = self.lista_ataques.getEntry(0)
                         nodo_impacto = impacto.getIntoNodePath()

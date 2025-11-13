@@ -46,7 +46,6 @@ class Juego(ShowBase):
         # COLISIONES
         self.cTrav = CollisionTraverser()
         self.pusher = CollisionHandlerPusher()
-        
         self.cHandler = CollisionHandlerEvent()
         self.cHandler.addInPattern('%fn-into-%in')
         self.cTrav.setRespectPrevTransform(True)
@@ -77,6 +76,7 @@ class Juego(ShowBase):
         #self.mapa = Laberinto(self)
         
         self.jugador = Personaje(self)
+        
         
         # TEST CARDMAKER
 #         cm = CardMaker("myCard")
@@ -134,7 +134,6 @@ class Juego(ShowBase):
         if len(self.enemigos) < self.enemigos_max:
             spawn = random.choice(self.sp_enemigos)
             enemigo = Enemigo(spawn, self)
-
             self.enemigos.append(enemigo)
             
     def spawnear_vecinos(self):
@@ -149,7 +148,7 @@ class Juego(ShowBase):
             
     def limpiar(self, colision):
         nombre = colision.getIntoNode().getName()
-
+        self.jugador.actualizar_puntos(self.vecinos[0].puntos)
         for vecino in self.vecinos:
             if vecino.nombre == nombre:
                 vecino.eliminar()
