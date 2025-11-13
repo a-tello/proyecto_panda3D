@@ -1,21 +1,26 @@
 import math
 import random
+from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue
+from panda3d.core import CollisionSphere, CollisionNode, CollisionHandlerPusher, CollisionHandlerQueue
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3
 from direct.gui.OnscreenImage import OnscreenImage
-
+from direct.gui.OnscreenText import OnscreenText
+from panda3d.core import TextNode
 
 class Personaje():
     def __init__(self, juego):
+        
         self.juego = juego
+        
+        
         self.personaje = Actor('assets/models/act_p3d_chan', {
                             'stand' : 'assets/models/a_p3d_chan_idle',
                             'run' : 'assets/models/a_p3d_chan_run'
                         })
-        self.personaje.setPos(6, 6, 0)
+        self.personaje.setPos(juego.sp_jugador)
         self.personaje.getChild(0).setH(180)
         self.personaje.reparentTo(self.juego.render)
         self.personaje.loop('stand')
@@ -43,8 +48,6 @@ class Personaje():
 
 
         # CAMARA 
-
-
         # juego.cam.setPos(0, -2, 20)
         # juego.cam.setP(-90)
         juego.cam.setPos(0, -2, 1)  
@@ -56,25 +59,42 @@ class Personaje():
         self.velocidad = 5
         self.velocidad_rotacion = 120.0
         self.sensibilidad_mouse = 0.3
+        self.puntaje = 0
 
-        # COLISION
+        # COLISION (con paredes y enemigos)
         cn_jugador = CollisionNode('personaje')
         cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
-        self.colisionador.show()
 
-        # MASCARA DE COLIISON (contra enemigos)
-        mascara = BitMask32()
-        mascara.setBit(1)
-        self.colisionador.node().setIntoCollideMask(mascara)
+        #  MASCARA DE COLIISON (contra enemigos y paredes)
+        self.colisionador.node().setFromCollideMask(BIT_PAREDES | BIT_ENEMIGOS)
+        self.colisionador.node().setIntoCollideMask(BIT_JUGADOR)
 #        self.colisionador.node().setFromCollideMask(BitMask32.allOff())
-        self.colisionador.node().setFromCollideMask(mascara)
 
-        juego.pusher.addCollider(self.colisionador, self.personaje)
-        juego.cTrav.addCollider(self.colisionador, juego.pusher)
+        self.personaje_pusher = CollisionHandlerPusher()
+        self.personaje_pusher.addCollider(self.colisionador, self.personaje)
+        #juego.pusher.addCollider(self.colisionador, self.personaje)
+        #juego.cTrav.addCollider(self.colisionador, juego.pusher)
+        juego.cTrav.addCollider(self.colisionador, self.personaje_pusher)
         
+        
+        # COLISION (con NPCs y objetos)
+        cn_jugador_obj = CollisionNode('personaje_obj')
+        cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
+        self.colisionador_obj = self.personaje.attachNewNode(cn_jugador_obj)
+        self.colisionador_obj.node().setFromCollideMask(BIT_NPCs | BIT_OBJETOS)
+        self.colisionador_obj.node().setIntoCollideMask(BIT_ENEMIGOS)
 
+        juego.cTrav.addCollider(self.colisionador_obj, juego.cHandler)
+        
+        # PUNTAJE
+        self.scoreUI = OnscreenText(text = '0',
+                            pos = (-1.28, .75),
+                            mayChange = True,
+                            scale=.1,
+                            fg=(255,255,255,255),
+                            align = TextNode.ALeft)
 
         
         # DISPAROS

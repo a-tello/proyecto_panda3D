@@ -1,7 +1,7 @@
 import random
 from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, BitMask32
 from PIL import Image
-
+from constantes import BIT_PAREDES
 
 class Nivel():
     def __init__(self, juego):
@@ -43,8 +43,8 @@ class Nivel():
     def agregar_colision(self, nodo):
         nodo_colision = CollisionNode('pared')
         nodo_colision.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 0.5, 0.5, 0.5))
-        # nodo_colision.setFromCollideMask(BitMask32.allOff())
-        # nodo_colision.setIntoCollideMask(BitMask32.bit(2))
+        nodo_colision.setFromCollideMask(BitMask32.allOff())
+        nodo_colision.setIntoCollideMask(BIT_PAREDES)
         nc_path = nodo.attachNewNode(nodo_colision)
         nc_path.show()
 
@@ -53,23 +53,36 @@ class MapaImagen(Nivel):
     def __init__(self, juego, imagen):
         super().__init__(juego)
 
+        self.mapeado = {'sp_jugador': (0,0,255), 
+                        'sp_vecino': (0,255,0), 
+                        'sp_enemigo': (255,0,0),
+                        'pared': (0,0,0),
+                        'piso': (255,255,255)}
+
         self.cargar_matriz_imagen(imagen)
 
     def cargar_matriz_imagen(self, imagen):
-        mapa = Image.open(imagen).convert('L')
-        ancho, alto = mapa.size
+        with Image.open(imagen) as im:
+            ancho, alto = im.size
+            
+            for y in range(alto):
+                fila = []
+                for x in range(ancho):
+                    pixel = im.getpixel((x, y))[:3]
+                    if pixel == self.mapeado['pared']: 
+                        fila.append(1)
+                    else:                          
+                        fila.append(0)
+                        if pixel == self.mapeado['sp_jugador']:                            
+                            self.juego.sp_jugador = (x,y,0)
+                        elif pixel == self.mapeado['sp_vecino']:
+                            self.juego.sp_vecinos.append((x,y,0))
+                        elif pixel == self.mapeado['sp_enemigo']:
+                            self.juego.sp_enemigos.append((x,y,1))
+                            
+                self.mapa.append(fila)
         
-        for y in range(alto):
-            fila = []
-            for x in range(ancho):
-                pixel = mapa.getpixel((x, y))
-                if pixel < 128: 
-                    fila.append(1)
-                else:  
-                    fila.append(0)
-            self.mapa.append(fila)
-        
-        self.crear_escenario(self.mapa)
+            self.crear_escenario(self.mapa)
 
 
 class Laberinto(Nivel):

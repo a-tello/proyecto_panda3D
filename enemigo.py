@@ -1,8 +1,9 @@
 import math
 import random
+from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue
+from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue, CollisionHandlerPusher
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3
 from direct.gui.OnscreenImage import OnscreenImage
@@ -33,23 +34,26 @@ class Enemigo():
         colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
         self.colisionador = self.zombie.attachNewNode(colliderNode)
         self.colisionador.setPythonTag('owner', self)
-        mascara = BitMask32()
-        mascara.setBit(2)
-        self.colisionador.node().setIntoCollideMask(mascara)
+        # mascara = BitMask32()
+        # mascara.setBit(2)
+        self.colisionador.node().setIntoCollideMask(BIT_PAREDES | BIT_ENEMIGOS | BIT_JUGADOR)
+        self.colisionador.node().setFromCollideMask(BIT_ENEMIGOS)
         # self.colisionador.node().setFromCollideMask(BitMask32.bit(2))
         # self.colisionador.node().setIntoCollideMask(BitMask32.bit(1))
         
-        juego.pusher.addCollider(self.colisionador, self.zombie)
-        juego.cTrav.addCollider(self.colisionador, juego.pusher)
+        self.juego.zombie_pusher(self.colisionador, self.zombie)
+        juego.cTrav.addCollider(self.colisionador, juego.zombie_pusher)
+        #juego.pusher.addCollider(self.colisionador, self.zombie)
+        #juego.cTrav.addCollider(self.colisionador, juego.pusher)
 
         # COLISION DE ATAQUE (nodo)
         self.ataque = CollisionSegment(0,0,0,1,0,0)
         ataque_nodo = CollisionNode('ataque')
         ataque_nodo.addSolid(self.ataque)
         # MASCARA DE COLISION (para no atacar a otros enemigos)
-        mascara_ataque = BitMask32()
-        mascara_ataque.setBit(1)
-        ataque_nodo.setFromCollideMask(mascara_ataque)
+        # mascara_ataque = BitMask32()
+        # mascara_ataque.setBit(1)
+        ataque_nodo.setFromCollideMask(BIT_JUGADOR)
         ataque_nodo.setIntoCollideMask(BitMask32().allOff())
 
         self.ataque_np = juego.render.attachNewNode(ataque_nodo)

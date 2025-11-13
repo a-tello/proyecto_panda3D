@@ -1,6 +1,7 @@
 from menu import MenuPrincipal, MenuOpciones
 from personaje import Personaje
 from enemigo import Enemigo
+from vecino import Vecino
 from nivel import Laberinto, MapaImagen
 from panda3d.core import WindowProperties, Vec3
 import random
@@ -28,9 +29,6 @@ class Juego(ShowBase):
         self.menu_opciones = MenuOpciones(self)
         self.menu_opciones.esconder_menu()
 
-        # ENTORNO
-        self.mapa = MapaImagen(self, 'assets/maps/lvl1.png')
-        #self.mapa = Laberinto(self)
 
         # ILUMINACION
         ambient = AmbientLight('ambient')
@@ -55,17 +53,30 @@ class Juego(ShowBase):
         
         
         # JUGADOR
-        self.jugador = Personaje(self)
+        self.sp_jugador = Vec3()
         
         
         
         # ENEMIGOS
         self.enemigos = []
         self.enemigos_muertos = []
-        self.spawn_points = []
+        self.sp_enemigos = []
         self.enemigos_max = 15
         self.intervalo_spawn = 2
         self.temporizador_spawn = 2
+        self.zombie_pusher = CollisionHandlerPusher()
+        
+        
+        # VECINOS
+        self.vecinos = []
+        self.cantidad_vecinos = 5
+        self.sp_vecinos = []
+        
+        # ENTORNO
+        self.mapa = MapaImagen(self, 'assets/maps/lvl1_1.png')
+        #self.mapa = Laberinto(self)
+        
+        self.jugador = Personaje(self)
         
         # TEST CARDMAKER
 #         cm = CardMaker("myCard")
@@ -81,11 +92,7 @@ class Juego(ShowBase):
 # #        self.card_np.reparentTo(render)
 #         self.card_np.setTransparency(TransparencyAttrib.MAlpha)
 #         #self.card_np.setBillboardPointEye()
-#         self.card_np.setTwoSided(True)
-        
-                
-        
-
+#         self.card_np.setTwoSided(True)            
 
     def actualizar(self, task):
         dt = self.clock.getDt()
@@ -94,6 +101,7 @@ class Juego(ShowBase):
         self.jugador.mover(dt)
         
         self.temporizador_spawn -= dt
+        
         if self.temporizador_spawn <= 0:
             self.temporizador_spawn = self.intervalo_spawn
             self.spawnear_enemigo()
@@ -108,26 +116,46 @@ class Juego(ShowBase):
         self.menu_principal.esconder_menu()
         self.pantalla.setCursorHidden(True)
         self.win.requestProperties(self.pantalla)
-        self.buscar_spawns()
+        self.spawnear_vecinos()
+        #self.buscar_spawns()
         self.taskMgr.add(self.actualizar, 'actualizar')
 
-    def buscar_spawns(self):
-        print(self.mapa.mapa)
-        alto = len(self.mapa.mapa)
-        ancho = len(self.mapa.mapa[0])
+    # def buscar_spawns(self):
+    #     print(self.mapa.mapa)
+    #     alto = len(self.mapa.mapa)
+    #     ancho = len(self.mapa.mapa[0])
 
-        for y in range(alto):
-            for x in range(ancho):
-                if self.mapa.mapa[y][x] == 0:
-                    self.spawn_points.append(Vec3(x, y, 1))
+    #     for y in range(alto):
+    #         for x in range(ancho):
+    #             if self.mapa.mapa[y][x] == 0:
+    #                 self.sp_enemigos.append(Vec3(x, y, 1))
     
     def spawnear_enemigo(self):
         if len(self.enemigos) < self.enemigos_max:
-            spawn = random.choice(self.spawn_points)
+            spawn = random.choice(self.sp_enemigos)
             enemigo = Enemigo(spawn, self)
 
             self.enemigos.append(enemigo)
-          
+            
+    def spawnear_vecinos(self):
+        for i in range(self.cantidad_vecinos):
+            spawn = random.choice(self.sp_vecinos)
+            modelo = random.randint(1,5)
+            nombre = f'vecino_{i}'
+            vecino = Vecino(self, str(modelo), spawn, nombre)
+            self.vecinos.append(vecino)
+            self.sp_vecinos.remove(spawn)
+            self.accept(f'personaje_obj-into-{nombre}', self.limpiar)
+            
+    def limpiar(self, colision):
+        nombre = colision.getIntoNode().getName()
+
+        for vecino in self.vecinos:
+            if vecino.nombre == nombre:
+                vecino.eliminar()
+                self.vecinos.remove(vecino)
+                break
+            
     def menu(self):
         self.menu_opciones.esconder_menu()
         self.menu_principal.mostrar_menu()
