@@ -2,7 +2,7 @@ import math
 import random
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionRay, CollisionHandlerQueue
+from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3
 from direct.gui.OnscreenImage import OnscreenImage
@@ -23,7 +23,7 @@ class Personaje():
         # ATRIBUTOS
         self.vida = 10
         self.velocidad = 5
-        self.ataque = 20
+        self.ataque = 3
 
         # TECLAS
         self.teclas = {'adelante': False, 'atras': False, 'izquierda': False, 'derecha': False, 'usar': False, 'disparar': False}
@@ -61,8 +61,20 @@ class Personaje():
         cn_jugador = CollisionNode('personaje')
         cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
+        self.colisionador.setPythonTag('owner', self)
         self.colisionador.show()
+
+        # MASCARA DE COLIISON (contra enemigos)
+        mascara = BitMask32()
+        mascara.setBit(1)
+        self.colisionador.node().setIntoCollideMask(mascara)
+#        self.colisionador.node().setFromCollideMask(BitMask32.allOff())
+        self.colisionador.node().setFromCollideMask(mascara)
+
+        juego.pusher.addCollider(self.colisionador, self.personaje)
+        juego.cTrav.addCollider(self.colisionador, juego.pusher)
         
+
 
         
         # DISPAROS
@@ -112,10 +124,10 @@ class Personaje():
         self.iconos_vida_true = []
         self.iconos_vida_false = []
         for i in range(self.vida):
-            vida_img_true = OnscreenImage(image = "vida_completa.png",
+            vida_img_true = OnscreenImage(image = 'vida_completa.png',
                                 pos = (-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
                                 
-            vida_img_false = OnscreenImage(image = "vida_vacia.png",
+            vida_img_false = OnscreenImage(image = 'vida_vacia.png',
                                 pos=(-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
             
             vida_img_true.setTransparency(True)
@@ -129,16 +141,17 @@ class Personaje():
     def actualizar_tecla(self, tecla, estado):
         self.teclas[tecla] = estado
 
-    def actualizar_vida(self):
+    def actualizar_vida(self, danio):
+        print(self.vida)
+        self.vida += danio
         for i, icono in enumerate(self.iconos_vida_true):
-            if i < 7:
-                print('si')
+            if i < self.vida:
                 icono.show()
             else:
                 self.iconos_vida_false[i].show()
 
     def mover(self, dt):
-        self.actualizar_vida()
+        self.actualizar_vida(0)
         # MOVIMIENTO CAMARA
         if self.juego.mouseWatcherNode.hasMouse():
             x = self.juego.win.getPointer(0).getX()
@@ -233,7 +246,7 @@ class Personaje():
             bala.setHpr(self.personaje.getHpr())    
 
             self.balas_activas.append({'modelo': bala, 'velocidad': 50})
-            print(self.balas_activas,"\n")
+            print(self.balas_activas,'\n')
             self.cooldown = 0.3  
         
         for bala in self.balas_activas:
@@ -265,54 +278,6 @@ class Personaje():
 
 
 
-
-class Enemigo():
-    def __init__(self, spawn, juego):
-        self.juego = juego
-        self.objetivo = self.juego.jugador.personaje
-        self.zombie = Actor('assets/models/monkey')
-        self.zombie.reparentTo(juego.render)
-        self.zombie.setPos(spawn)
-        self.zombie.setScale(.5)
-        
-        # ATRIBUTOS
-        self.vida = 100
-        self.velocidad = 2
-        self.ataque = 10
-
-        # MOVIMIENTO RANDOM
-        self.direccion_random = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
-        self.direccion_random.normalize()
-        
-        # COLISION
-        colliderNode = CollisionNode('enemigo')
-        colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
-        self.colision = self.zombie.attachNewNode(colliderNode)
-        # self.colision.node().setFromCollideMask(BitMask32.bit(2))
-        # self.colision.node().setIntoCollideMask(BitMask32.bit(1))
-        
-        juego.pusher.addCollider(self.colision, self.zombie)
-        juego.cTrav.addCollider(self.colision, juego.pusher)
-
-
-    def mover(self, dt):
-        direccion_objetivo = self.objetivo.getPos() - self.zombie.getPos()
-        direccion_objetivo.setZ(0)
-        distancia = direccion_objetivo.length()
-
-        avance = self.zombie.getPos() + self.direccion_random * self.velocidad * dt
-
-        if distancia < 20:
-            direccion_objetivo.normalize()
-            velocidad = 3
-            avance = self.zombie.getPos() + direccion_objetivo * velocidad * dt
-        
-        else:
-            if random.random() < 0.01:  
-                self.direccion_random = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
-                self.direccion_random.normalize()
-
-        self.zombie.setPos(avance)
 
         
 

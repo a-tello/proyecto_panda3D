@@ -1,5 +1,6 @@
 from menu import MenuPrincipal, MenuOpciones
-from personaje import Personaje, Enemigo
+from personaje import Personaje
+from enemigo import Enemigo
 from nivel import Laberinto, MapaImagen
 from panda3d.core import WindowProperties, Vec3
 import random
@@ -56,8 +57,7 @@ class Juego(ShowBase):
         # JUGADOR
         self.jugador = Personaje(self)
         
-        self.pusher.addCollider(self.jugador.colisionador, self.jugador.personaje)
-        self.cTrav.addCollider(self.jugador.colisionador, self.pusher)
+        
         
         # ENEMIGOS
         self.enemigos = []
@@ -68,20 +68,20 @@ class Juego(ShowBase):
         self.temporizador_spawn = 2
         
         # TEST CARDMAKER
-        cm = CardMaker("myCard")
+#         cm = CardMaker("myCard")
 
 
-        self.card_np = render.attach_new_node(cm.generate())
+#         self.card_np = render.attach_new_node(cm.generate())
 
-        tex = TexturePool.load_texture("z-Photoroom.png")
+#         tex = TexturePool.load_texture("z-Photoroom.png")
 
-        self.card_np.set_texture(tex)
-        self.card_np.setPos(7, 7, 0) 
-        self.card_np.setScale(2)
-#        self.card_np.reparentTo(render)
-        self.card_np.setTransparency(TransparencyAttrib.MAlpha)
-        #self.card_np.setBillboardPointEye()
-        self.card_np.setTwoSided(True)
+#         self.card_np.set_texture(tex)
+#         self.card_np.setPos(7, 7, 0) 
+#         self.card_np.setScale(2)
+# #        self.card_np.reparentTo(render)
+#         self.card_np.setTransparency(TransparencyAttrib.MAlpha)
+#         #self.card_np.setBillboardPointEye()
+#         self.card_np.setTwoSided(True)
         
                 
         
@@ -89,7 +89,7 @@ class Juego(ShowBase):
 
     def actualizar(self, task):
         dt = self.clock.getDt()
-        self.card_np.lookAt(self.jugador.personaje)
+        #self.card_np.lookAt(self.jugador.personaje)
         
         self.jugador.mover(dt)
         
