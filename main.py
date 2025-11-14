@@ -1,3 +1,6 @@
+from direct.gui.OnscreenText import OnscreenText
+from panda3d.core import TextNode
+
 from menu import MenuPrincipal, MenuOpciones
 from personaje import Personaje
 from enemigo import Enemigo
@@ -47,7 +50,9 @@ class Juego(ShowBase):
         self.cTrav = CollisionTraverser()
         self.pusher = CollisionHandlerPusher()
         self.cHandler = CollisionHandlerEvent()
+        self.cHandler_2 = CollisionHandlerEvent()
         self.cHandler.addInPattern('%fn-into-%in')
+        self.cHandler_2.addInPattern('%fn-into-%in')
         self.cTrav.setRespectPrevTransform(True)
         
         
@@ -78,21 +83,18 @@ class Juego(ShowBase):
         self.jugador = Personaje(self)
         
         
-        # TEST CARDMAKER
-#         cm = CardMaker("myCard")
-
-
-#         self.card_np = render.attach_new_node(cm.generate())
-
-#         tex = TexturePool.load_texture("z-Photoroom.png")
-
-#         self.card_np.set_texture(tex)
-#         self.card_np.setPos(7, 7, 0) 
-#         self.card_np.setScale(2)
-# #        self.card_np.reparentTo(render)
-#         self.card_np.setTransparency(TransparencyAttrib.MAlpha)
-#         #self.card_np.setBillboardPointEye()
-#         self.card_np.setTwoSided(True)            
+        self.accept(f'bala-into-enemigo_balas', self.impacto)
+                 
+    def impacto(self, a):
+        nombre = a.getIntoNode().getName()
+        bullet_np = a.getFromNodePath().get_parent()
+        enemy_np = a.getIntoNodePath().get_parent()
+        bullet_np.removeNode()
+        for enemigo in self.enemigos:
+            if nombre == enemigo.nombre:
+                print('por favor')
+                self.enemigos.remove(enemy_np)
+                enemy_np.removeNode()
 
     def actualizar(self, task):
         dt = self.clock.getDt()
@@ -117,6 +119,9 @@ class Juego(ShowBase):
         self.pantalla.setCursorHidden(True)
         self.win.requestProperties(self.pantalla)
         self.spawnear_vecinos()
+        
+        OnscreenText(text = '+', pos = (0,0,0), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
+
         #self.buscar_spawns()
         self.taskMgr.add(self.actualizar, 'actualizar')
 
@@ -133,7 +138,7 @@ class Juego(ShowBase):
     def spawnear_enemigo(self):
         if len(self.enemigos) < self.enemigos_max:
             spawn = random.choice(self.sp_enemigos)
-            enemigo = Enemigo(spawn, self)
+            enemigo = Enemigo(self, f'enemigo_{len(self.enemigos)}', spawn)
             self.enemigos.append(enemigo)
             
     def spawnear_vecinos(self):

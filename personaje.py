@@ -50,7 +50,7 @@ class Personaje():
         # CAMARA 
         # juego.cam.setPos(0, -2, 20)
         # juego.cam.setP(-90)
-        juego.cam.setPos(0, -2, 1)  
+        juego.cam.setPos(0, -2, .5)  
         juego.cam.node().getLens().setFov(80)
         self.angulo_horizontal = 0  
         self.angulo_vertical = 0  
@@ -86,46 +86,6 @@ class Personaje():
         # PUNTAJE
         self.puntaje_pantalla = OnscreenText(text = '0', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
-        
-        # DISPAROS
-        # self.bala = CollisionRay(0, 0, 0, 0, 1, 0)
-        # bala_nodo = CollisionNode('bala')
-        # bala_nodo.addSolid(self.bala)
-        
-        # self.bala_np = juego.render.attachNewNode(bala_nodo)
-        # self.bala_np.setPos(self.juego.cam, 0, 0, 1.5)
-        # self.bala_np.setQuat(self.juego.cam.getQuat(render))
-        # self.bala_lista = CollisionHandlerQueue()
-        
-        # self.juego.cTrav.addCollider(self.bala_np, self.bala_lista)
-        
-        
-        
-        
-        
-        # mask = BitMask32()
-        # mask.setBit(1)
-
-        # self.colision.node().setIntoCollideMask(mask)
-
-        # mask = BitMask32()
-        # mask.setBit(1)
-
-        # self.colision.node().setFromCollideMask(mask)
-
-        # mask = BitMask32()
-        # mask.setBit(2)
-        # bala_nodo.setFromCollideMask(mask)
-
-        # mask = BitMask32()
-        # bala_nodo.setIntoCollideMask(mask)
-        
-        
-        # self.bala_modelo = self.juego.loader.loadModel('assets/laser/bambooLaser')
-        # self.bala_modelo.reparentTo(self.personaje)
-        # self.bala_modelo.setZ(1.5)
-        # self.bala_modelo.setLightOff()
-        # self.bala_modelo.hide()
         self.balas_activas = []
         self.cooldown = 0
         
@@ -152,7 +112,6 @@ class Personaje():
         self.teclas[tecla] = estado
 
     def actualizar_vida(self, danio):
-        print(self.vida)
         self.vida += danio
         for i, icono in enumerate(self.iconos_vida_true):
             if i < self.vida:
@@ -253,25 +212,35 @@ class Personaje():
         # else:
         #     self.bala_modelo.hide()
         
-            bala = loader.loadModel('assets/laser/bambooLaser')   
-            bala.setScale(2)
+            bala = self.juego.loader.loadModel('assets/laser/bambooLaser')   
+            bala.setScale(1)
             bala.reparentTo(self.juego.render)
-            bala.setPos(self.personaje.getPos())     
-            bala.setHpr(self.personaje.getHpr())    
+            bala.setPos(self.personaje.getPos()+(0,0,2))     
+            bala.setHpr(self.juego.camera.getHpr())    
 
-            self.balas_activas.append({'modelo': bala, 'velocidad': 50})
+            
+            bala_nodo = bala.attachNewNode(CollisionNode('bala'))
+            bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.3))
+            bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
+            bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
+            bala_nodo.show()
+            self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
+
+            self.balas_activas.append({'modelo': bala, 'velocidad': 40})
             print(self.balas_activas,'\n')
             self.cooldown = 0.3  
         
-        for bala in self.balas_activas:
-            modelo = bala['modelo']
-            modelo.setY(modelo, bala['velocidad'] * dt)  
+        # for bala in self.balas_activas:
+        #     modelo = bala['modelo']
+        #     modelo.setY(modelo, bala['velocidad'] * dt)  
 
-            bala_nodo = modelo.attachNewNode(CollisionNode('bala'))
-            bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.2))
-            bala_nodo.node().setFromCollideMask(BitMask32.bit(1))
-            bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
-            self.juego.cTrav.traverse(self.juego.render)
+        #     bala_nodo = modelo.attachNewNode(CollisionNode('bala'))
+        #     bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.2))
+        #     bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
+        #     bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
+        #     self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
+            
+            #self.juego.cTrav.traverse(self.juego.render)
             
         for bala in self.balas_activas[:]:
             modelo = bala['modelo']

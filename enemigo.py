@@ -9,8 +9,9 @@ from panda3d.core import Point2, Point3, Vec3
 from direct.gui.OnscreenImage import OnscreenImage
 
 class Enemigo():
-    def __init__(self, spawn, juego):
+    def __init__(self, juego, nombre, spawn):
         self.juego = juego
+        self.nombre = nombre
         self.objetivo = self.juego.jugador.personaje
         self.zombie = Actor('assets/models/monkey')
         self.zombie.reparentTo(juego.render)
@@ -30,24 +31,36 @@ class Enemigo():
         self.direccion_random.normalize()
         
         # COLISION
-        colliderNode = CollisionNode('enemigo')
-        colliderNode.addSolid(CollisionSphere(0, 0, 0, 1))
-        self.colisionador = self.zombie.attachNewNode(colliderNode)
-        self.colisionador.node().setIntoCollideMask(BitMask32().bit(2))
+        zombie_cn = CollisionNode(nombre)
+        zombie_cn.addSolid(CollisionSphere(0, 0, 0, 1))
+        self.colisionador = self.zombie.attachNewNode(zombie_cn)
+        self.colisionador.node().setIntoCollideMask(BitMask32.bit(2))
+        zombie_cn.setFromCollideMask(BitMask32.bit(1))
+
 
         self.juego.pusher.addCollider(self.colisionador, self.zombie)
         self.juego.cTrav.addCollider(self.colisionador, self.juego.pusher)
+        
+        # COLISION (balas)
+        zombie_balas_cn = CollisionNode('enemigo_balas')
+        zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
+        self.colisionador_balas = self.zombie.attachNewNode(zombie_balas_cn)
+        zombie_balas_cn.setFromCollideMask(BitMask32.allOff())
+        zombie_balas_cn.setIntoCollideMask(BitMask32.bit(3))
 
+        self.colisionador_balas.show()
+
+        self.juego.cTrav.addCollider(self.colisionador_balas, juego.cHandler)
 
         # COLISION DE ATAQUE (nodo)
         self.ataque = CollisionSegment(0,0,0,1,0,0)
-        ataque_nodo = CollisionNode('ataque')
-        ataque_nodo.addSolid(self.ataque)
+        ataque_cn = CollisionNode('ataque')
+        ataque_cn.addSolid(self.ataque)
         # MASCARA DE COLISION (para no atacar a otros enemigos)
-        ataque_nodo.setFromCollideMask(BitMask32().bit(1))
-        ataque_nodo.setIntoCollideMask(BitMask32().allOff())
+        ataque_cn.setFromCollideMask(BitMask32().bit(1))
+        ataque_cn.setIntoCollideMask(BitMask32().allOff())
 
-        self.ataque_np = juego.render.attachNewNode(ataque_nodo)
+        self.ataque_np = juego.render.attachNewNode(ataque_cn)
         self.lista_ataques = CollisionHandlerQueue()
 
         juego.cTrav.addCollider(self.ataque_np, self.lista_ataques)
