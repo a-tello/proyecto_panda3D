@@ -5,19 +5,23 @@ from direct.actor.Actor import Actor
 from panda3d.core import Vec3
 from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue, CollisionHandlerPusher
 from panda3d.core import BitMask32
-from panda3d.core import Point2, Point3, Vec3
+from panda3d.core import Point2, Point3, Vec3, VBase4
+from direct.interval.IntervalGlobal import LerpColorScaleInterval,Sequence
+
 from direct.gui.OnscreenImage import OnscreenImage
 
 class Enemigo():
-    def __init__(self, juego, nombre, spawn):
+    def __init__(self, juego, nombre, spawn, identificador):
         self.juego = juego
         self.nombre = nombre
+        self.id = identificador
         self.objetivo = self.juego.jugador.personaje
         self.zombie = Actor('assets/models/monkey')
         self.zombie.reparentTo(juego.render)
         self.zombie.setPos(spawn)
         self.zombie.setScale(.5)
-        
+        self.zombie.setTransparency(True)  # Habilita la transparencia para el modelo
+
         # ATRIBUTOS
         self.vida = 10
         self.velocidad = 2
@@ -42,7 +46,7 @@ class Enemigo():
         self.juego.cTrav.addCollider(self.colisionador, self.juego.pusher)
         
         # COLISION (balas)
-        zombie_balas_cn = CollisionNode('enemigo_balas')
+        zombie_balas_cn = CollisionNode(f'enemigo_balas_{identificador}')
         zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
         self.colisionador_balas = self.zombie.attachNewNode(zombie_balas_cn)
         zombie_balas_cn.setFromCollideMask(BitMask32.allOff())
@@ -66,6 +70,28 @@ class Enemigo():
         juego.cTrav.addCollider(self.ataque_np, self.lista_ataques)
 
 
+    def actualizar_vida(self, danio):
+        self.vida += danio
+        self.zombie.setColorScale(1, 0, 0, 1)  
+        color = LerpColorScaleInterval(self.zombie, 0.3, (1, 1, 1, 1)) 
+        color.start()
+    
+
+    def morir(self):
+        morir = LerpColorScaleInterval(self.zombie, 2.0, VBase4(1, 1, 1, 0))
+        morir.start()
+        morir.setDoneEvent("morir_")
+        self.juego.accept("morir_", self.a)
+
+    def a(self):
+        self.zombie.cleanup()
+        self.zombie.remove_node()
+
+        # transparencia = self.zombie.getColorScale()[3]
+        # if transparencia < 1:
+
+    def eliminar(self):
+        self.zombie.remove_node()
 
     def mover(self, dt):
         direccion_objetivo = self.objetivo.getPos() - self.zombie.getPos()

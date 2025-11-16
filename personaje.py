@@ -227,7 +227,7 @@ class Personaje():
             self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
 
             self.balas_activas.append({'modelo': bala, 'velocidad': 40})
-            print(self.balas_activas,'\n')
+            #print(self.balas_activas,'\n')
             self.cooldown = 0.3  
         
         # for bala in self.balas_activas:

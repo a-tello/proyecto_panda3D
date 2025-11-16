@@ -64,6 +64,7 @@ class Juego(ShowBase):
         # ENEMIGOS
         self.enemigos = []
         self.enemigos_muertos = []
+        self.enemigos_id = 0
         self.sp_enemigos = []
         self.enemigos_max = 15
         self.intervalo_spawn = 2
@@ -82,19 +83,23 @@ class Juego(ShowBase):
         
         self.jugador = Personaje(self)
         
-        
-        self.accept(f'bala-into-enemigo_balas', self.impacto)
                  
     def impacto(self, a):
-        nombre = a.getIntoNode().getName()
-        bullet_np = a.getFromNodePath().get_parent()
-        enemy_np = a.getIntoNodePath().get_parent()
-        bullet_np.removeNode()
+        id_enemigo = a.getIntoNode().getName().split('_')[-1]
+        bala_np = a.getFromNodePath().get_parent()
+        enemigo_np = a.getIntoNodePath().get_parent()
+        bala_np.removeNode()
         for enemigo in self.enemigos:
-            if nombre == enemigo.nombre:
-                print('por favor')
-                self.enemigos.remove(enemy_np)
-                enemy_np.removeNode()
+            if id_enemigo == str(enemigo.id):
+                print(len(self.enemigos), enemigo_np)
+                enemigo.actualizar_vida(-self.jugador.ataque)
+                if enemigo.vida < 1:
+                    self.enemigos.remove(enemigo)
+                    self.enemigos_muertos.append(enemigo)
+                    print('eliminar')
+                    enemigo.morir()
+                    #enemigo.eliminar()
+                    #enemigo_np.removeNode()
 
     def actualizar(self, task):
         dt = self.clock.getDt()
@@ -111,6 +116,10 @@ class Juego(ShowBase):
         for enemigo in self.enemigos:
             enemigo.mover(dt)
         
+        for enemigo in self.enemigos_muertos:
+            enemigo.morir()
+            self.enemigos_muertos.remove(enemigo) 
+
         self.cTrav.traverse(self.render)
         return task.cont
 
@@ -122,7 +131,6 @@ class Juego(ShowBase):
         
         OnscreenText(text = '+', pos = (0,0,0), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
-        #self.buscar_spawns()
         self.taskMgr.add(self.actualizar, 'actualizar')
 
     # def buscar_spawns(self):
@@ -138,9 +146,12 @@ class Juego(ShowBase):
     def spawnear_enemigo(self):
         if len(self.enemigos) < self.enemigos_max:
             spawn = random.choice(self.sp_enemigos)
-            enemigo = Enemigo(self, f'enemigo_{len(self.enemigos)}', spawn)
+            enemigo = Enemigo(self, f'enemigo_{self.enemigos_id}', spawn, self.enemigos_id)
             self.enemigos.append(enemigo)
-            
+            self.accept(f'bala-into-enemigo_balas_{self.enemigos_id}', self.impacto)
+            self.enemigos_id += 1
+
+
     def spawnear_vecinos(self):
         for i in range(self.cantidad_vecinos):
             spawn = random.choice(self.sp_vecinos)
