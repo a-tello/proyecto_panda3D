@@ -75,7 +75,7 @@ class MapaImagen(Nivel):
                         elif pixel == self.mapeado['sp_vecino']:
                             self.juego.sp_vecinos.append((x,y,0))
                         elif pixel == self.mapeado['sp_enemigo']:
-                            self.juego.sp_enemigos.append((x,y,1))
+                            self.juego.sp_enemigos.append((x,y,0))
                             
                 self.mapa.append(fila)
         
