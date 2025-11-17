@@ -108,6 +108,8 @@ class Personaje():
             self.iconos_vida_true.append(vida_img_true)
             self.iconos_vida_false.append(vida_img_false)
                 
+        self.sonido_disparo = juego.loader.loadSfx("assets/sounds/disparo.ogg")
+        self.sonido_disparo.setVolume(.02)
 
     def actualizar_tecla(self, tecla, estado):
         self.teclas[tecla] = estado
@@ -194,7 +196,7 @@ class Personaje():
                 
                 
         if self.teclas['disparar'] and self.cooldown <= 0:                              
-            
+            self.sonido_disparo.play()
             bala = self.juego.loader.loadModel("models/misc/sphere")
             bala.setScale(0.1, 0.5, 0.1)
             bala.setColor(0,255,0)

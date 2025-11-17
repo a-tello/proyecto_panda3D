@@ -2,7 +2,7 @@ import math
 import random
 from constantes import *
 from direct.actor.Actor import Actor
-from panda3d.core import Vec3
+from panda3d.core import Vec3, AudioSound
 from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue, CollisionBox
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3, VBase4
@@ -21,7 +21,10 @@ class Enemigo():
 
         self.zombie.loop('run')
         #self.zombie.setPlayRate(.2, "run")
-        
+        self.sonido_zombie = juego.loader.loadSfx("assets/sounds/zombie.ogg")
+        self.sonido_zombie.setVolume(0.02)
+        self.sonido_zombie.setLoop(True)
+
 
         self.zombie.reparentTo(juego.render)
         self.zombie.setPos(spawn)
@@ -91,6 +94,7 @@ class Enemigo():
         self.juego.accept("morir_", self.a)
 
     def a(self):
+        self.sonido_zombie.stop()
         self.zombie.cleanup()
         self.zombie.remove_node()
 
@@ -109,6 +113,8 @@ class Enemigo():
         avance = self.zombie.getPos() + self.direccion_random * self.velocidad * dt
 
         if distancia < 20:
+            if self.sonido_zombie.status() != AudioSound.PLAYING:
+                self.sonido_zombie.play()
             direccion_objetivo.normalize()
             velocidad = 3
             avance = self.zombie.getPos() + direccion_objetivo * velocidad * dt
@@ -129,6 +135,8 @@ class Enemigo():
                             self.delay_ataque = 1
         
         else:
+            if self.sonido_zombie.status() == AudioSound.PLAYING:
+                self.sonido_zombie.stop()
             if random.random() < 0.01:  
                 self.direccion_random = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
                 self.direccion_random.normalize()

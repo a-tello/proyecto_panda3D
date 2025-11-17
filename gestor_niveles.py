@@ -23,8 +23,14 @@ class Nivel():
         self.temporizador_spawn = 2
         #self.level_guardado = []
 
+        self.musica_nivel = None
+
     def cargar(self, info_nivel):
 
+        self.musica_nivel = self.juego.loader.loadSfx(info_nivel['musica'])
+        self.musica_nivel.setLoop(True)
+        self.musica_nivel.setVolume(0.075)
+        self.musica_nivel.play()
         self.cargar_mapa(info_nivel['mapa'])
         self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
         self.spawnear_enemigos(info_nivel['enemigos'])
