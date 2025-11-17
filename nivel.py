@@ -1,5 +1,5 @@
 import random
-from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, BitMask32
+from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, CollisionPlane
 from PIL import Image
 from constantes import *
 
@@ -19,7 +19,7 @@ class Nivel():
         textura_pared.setWrapV(textura_pared.WM_repeat)
         pared.setTexture(textura_pared, 1)
 
-        piso = self.juego.loader.loadModel('models/box')
+        piso = self.juego.loader.loadModel('models/box')        
         textura_piso = self.juego.loader.loadTexture('assets/Environment/tex/tierra.jpg')
         textura_piso.setWrapU(textura_piso.WM_repeat)
         textura_piso.setWrapV(textura_piso.WM_repeat)
@@ -37,10 +37,12 @@ class Nivel():
                 cubo_piso.setPos(x,y,-1)
                 if matriz[y][x] == 1:
                     cubo_pared = pared.copyTo(mapa_np)
-                    self.agregar_colision(cubo_pared)
+                    self.agregar_colision_pared(cubo_pared)
                     cubo_pared.setPos(x, y, 0)
 
-    def agregar_colision(self, nodo):
+        #self.agregar_colision_piso(piso)
+
+    def agregar_colision_pared(self, nodo):
         nodo_colision = CollisionNode('pared')
         nodo_colision.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 0.5, 0.5, 0.5))
         nodo.attachNewNode(nodo_colision)

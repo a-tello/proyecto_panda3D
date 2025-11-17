@@ -6,15 +6,14 @@ from personaje import Personaje
 from enemigo import Enemigo
 from vecino import Vecino
 from nivel import Laberinto, MapaImagen
-from panda3d.core import WindowProperties, Vec3
+from panda3d.core import WindowProperties, Vec3, Point3
 import random
 
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton
 from panda3d.core import AmbientLight, DirectionalLight
-from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent, CollisionNode, CollisionBox
 from direct.actor.Actor import Actor
-from panda3d.core import CardMaker, NodePath, TexturePool, TransparencyAttrib
 
 
 class Juego(ShowBase):
@@ -43,7 +42,7 @@ class Juego(ShowBase):
         self.render.setLight(self.render.attachNewNode(dlight))
 
         # CAMARA
-        self.disableMouse()
+        #self.disableMouse()
 
 
         # COLISIONES
@@ -79,7 +78,7 @@ class Juego(ShowBase):
         
         # ENTORNO
         self.mapa = MapaImagen(self, 'assets/maps/lvl1_1.png')
-        #self.mapa = Laberinto(self)
+       
         
         self.jugador = Personaje(self)
         
@@ -91,12 +90,10 @@ class Juego(ShowBase):
         bala_np.removeNode()
         for enemigo in self.enemigos:
             if id_enemigo == str(enemigo.id):
-                print(len(self.enemigos), enemigo_np)
                 enemigo.actualizar_vida(-self.jugador.ataque)
                 if enemigo.vida < 1:
                     self.enemigos.remove(enemigo)
                     self.enemigos_muertos.append(enemigo)
-                    print('eliminar')
                     enemigo.morir()
                     #enemigo.eliminar()
                     #enemigo_np.removeNode()

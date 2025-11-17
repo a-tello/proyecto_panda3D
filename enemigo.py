@@ -3,7 +3,7 @@ import random
 from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue, CollisionHandlerPusher
+from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue, CollisionBox
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3, VBase4
 from direct.interval.IntervalGlobal import LerpColorScaleInterval,Sequence
@@ -16,10 +16,17 @@ class Enemigo():
         self.nombre = nombre
         self.id = identificador
         self.objetivo = self.juego.jugador.personaje
-        self.zombie = Actor('assets/models/monkey')
+        #self.zombie = Actor('assets/models/monkey')
+        self.zombie = Actor('zombie1.glb', {'run': 'zombie1.glb'})
+        self.zombie.getChild(0).setH(180)
+
+        self.zombie.loop('run')
+        #self.zombie.setPlayRate(.2, "run")
+        
+
         self.zombie.reparentTo(juego.render)
         self.zombie.setPos(spawn)
-        self.zombie.setScale(.5)
+        self.zombie.setScale(1.2)
         self.zombie.setTransparency(True)  # Habilita la transparencia para el modelo
 
         # ATRIBUTOS
@@ -36,10 +43,11 @@ class Enemigo():
         
         # COLISION
         zombie_cn = CollisionNode(nombre)
-        zombie_cn.addSolid(CollisionSphere(0, 0, 0, 1))
+        #zombie_cn.addSolid(CollisionSphere(0, 0, 1, 1))
+        zombie_cn.addSolid(CollisionBox(Point3(0, 0, 1), .3, .3, 1))
         self.colisionador = self.zombie.attachNewNode(zombie_cn)
         self.colisionador.node().setIntoCollideMask(BitMask32.bit(2))
-        zombie_cn.setFromCollideMask(BitMask32.bit(1))
+        zombie_cn.setFromCollideMask(BitMask32.bit(1) | BitMask32.bit(2))
 
 
         self.juego.pusher.addCollider(self.colisionador, self.zombie)
@@ -47,12 +55,12 @@ class Enemigo():
         
         # COLISION (balas)
         zombie_balas_cn = CollisionNode(f'enemigo_balas_{identificador}')
-        zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
+        #zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
+        zombie_balas_cn.addSolid(CollisionBox(Point3(0, 0, 1), .2, .2, 1))
         self.colisionador_balas = self.zombie.attachNewNode(zombie_balas_cn)
         zombie_balas_cn.setFromCollideMask(BitMask32.allOff())
         zombie_balas_cn.setIntoCollideMask(BitMask32.bit(3))
 
-        self.colisionador_balas.show()
 
         self.juego.cTrav.addCollider(self.colisionador_balas, juego.cHandler)
 
@@ -94,12 +102,12 @@ class Enemigo():
         self.zombie.remove_node()
 
     def mover(self, dt):
+        self.zombie.lookAt(self.juego.jugador.personaje.getPos())
         direccion_objetivo = self.objetivo.getPos() - self.zombie.getPos()
         direccion_objetivo.setZ(0)
         distancia = direccion_objetivo.length()
 
         avance = self.zombie.getPos() + self.direccion_random * self.velocidad * dt
-
 
         if distancia < 20:
             direccion_objetivo.normalize()
@@ -127,3 +135,5 @@ class Enemigo():
                 self.direccion_random.normalize()
 
         self.zombie.setPos(avance)
+        h, p, r = self.zombie.getHpr()  
+        self.zombie.setHpr(h, 0, r)

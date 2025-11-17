@@ -3,7 +3,7 @@ import random
 from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionHandlerPusher, CollisionHandlerQueue
+from panda3d.core import CollisionSphere, CollisionNode, CollisionBox, CollisionHandlerQueue
 from panda3d.core import BitMask32
 from panda3d.core import Point2, Point3, Vec3
 from direct.gui.OnscreenImage import OnscreenImage
@@ -64,9 +64,10 @@ class Personaje():
         # COLISION (con paredes y enemigos)
         cn_jugador = CollisionNode('personaje')
         cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
+        cn_jugador.addSolid(CollisionBox(Point3(0, 0, 1), .3, .3, 1))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
-        cn_jugador.setFromCollideMask(BitMask32.bit(1))
+        cn_jugador.setFromCollideMask(BitMask32.bit(1) | BitMask32.bit(2) )
         cn_jugador.setIntoCollideMask(BitMask32.bit(1))
 
         self.juego.pusher.addCollider(self.colisionador, self.personaje)
@@ -223,7 +224,6 @@ class Personaje():
             bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.3))
             bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
             bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
-            bala_nodo.show()
             self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
 
             self.balas_activas.append({'modelo': bala, 'velocidad': 40})
