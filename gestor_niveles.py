@@ -1,8 +1,8 @@
 import random
 from panda3d.core import AmbientLight, DirectionalLight
-from nivel import MapaImagen
+from nivel import *
 from enemigo import Enemigo
-from panda3d.core import Vec3
+from panda3d.core import Vec3, Point3
 from vecino import Vecino
 from personaje import Personaje
 
@@ -31,20 +31,29 @@ class Nivel():
         self.spawnear_vecinos(info_nivel['vecinos'])
 
     def cargar_mapa(self, img_mapa):
+        # ENTORNO
+        skybox = self.juego.loader.loadModel("models/misc/sphere")
+        skybox.reparentTo(self.juego.render)
+        skybox.setScale(500)
+        skybox.setTwoSided(True)
+        textura = self.juego.loader.loadTexture("assets/Environment/cielo2.jpg")
+        skybox.setTexture(textura)
+        skybox.setPos(-10, -10, 0)
+
         mapa = MapaImagen(self.juego, img_mapa, self)
 
-        # ILUMINACION
-        ambient = AmbientLight('ambient')
+        #ILUMINACION
+        ambient = AmbientLight('ambient_light')
         ambient.setColor((0.5, 0.5, 0.5, 1))
         self.juego.render.setLight(self.juego.render.attachNewNode(ambient))
 
-        dlight = DirectionalLight('dlight')
+        dlight = DirectionalLight('directional_light')
         dlight.setColor((1, 1, 1, 1))
+        dlight.setDirection(Point3(1, -1, -1))
         self.juego.render.setLight(self.juego.render.attachNewNode(dlight))
 
 
     def spawnear_enemigos(self, cantidad):
-        print(len(self.enemigos))
         if len(self.enemigos) < cantidad:
             spawn = random.choice(self.enemigos_spawn)
             enemigo = Enemigo(self.juego, f'enemigo_{self.enemigos_id}', spawn, self.enemigos_id)
@@ -67,7 +76,6 @@ class Nivel():
         
         if self.temporizador_spawn <= 0:
             self.temporizador_spawn = self.intervalo_spawn
-            print(self.enemigos_max)
             self.spawnear_enemigos(self.enemigos_max)
 
         for enemigo in self.enemigos:

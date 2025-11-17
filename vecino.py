@@ -10,12 +10,12 @@ from direct.gui.OnscreenImage import OnscreenImage
 
 class Vecino():
     def __init__(self, juego, tipo, pos, nombre):
-        self.modelos = {'1':'boss.glb', '2':'boss.glb', '3':'boss.glb', '4':'boss.glb', '5':'boss.glb'}
+        self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/boss.glb', '3':'assets/models/boss.glb', '4':'assets/models/boss.glb', '5':'assets/models/boss.glb'}
         self.vecino = Actor(self.modelos[tipo], {'idle': self.modelos[tipo], 'action': self.modelos[tipo]})
         self.vecino.setPos(pos)
         self.vecino.reparentTo(juego.render)
         self.nombre = nombre
-        self.vecino.loop('action')
+        self.vecino.loop('idle')
         
         
         # COLISION

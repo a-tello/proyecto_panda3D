@@ -1,5 +1,6 @@
-from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton
+from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton, DirectDialog
 from panda3d.core import TextNode
+from direct.gui.OnscreenText import OnscreenText
 
 class Menu():
     def __init__(self, juego):
@@ -72,5 +73,49 @@ class MenuOpciones(Menu):
 
 
         btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)
+
+
+class MenuPausa(Menu):
+    def __init__(self, juego):
+        super().__init__(juego)
+        
+        #self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
+
+        title = DirectLabel(text = 'Pausa', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
+                        relief = None,  text_fg = (1, 1, 1, 1))
+        
+        btn = DirectButton(text = 'Continuar', command = juego.pausa, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)
+
+        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (0, 0, -0.2), parent = self.menu, scale = 0.1, 
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)
+
+        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)
+
+
+class PantallaFinal(Menu):
+    def __init__(self, juego, puntos):
+        super().__init__(juego)
+        
+        self.menu_fondo = DirectDialog(frameColor = (0, 0, 0, 255), frameSize = (-1, 1, -1, 1), parent = juego.render2d, fadeScreen = 0.4)
+        self.menu = DirectDialog(frameColor = (0, 0, 0, 0), fadeScreen = 0.4)
+
+        title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
+                        relief = None,  text_fg = (1, 1, 1, 1))
+        
+        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
+
+
+        btn = DirectButton(text = 'Reiniciar', pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)
+
+        btn = DirectButton(text = 'Menú principal', command = juego.menu, pos = (0, 0, -0.2), parent = self.menu, scale = 0.1, 
                         frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
         btn.setTransparency(True)

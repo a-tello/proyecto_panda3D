@@ -5,12 +5,11 @@ from menu import *
 from personaje import Personaje
 from enemigo import Enemigo
 from vecino import Vecino
-from nivel import Laberinto, MapaImagen
-from panda3d.core import WindowProperties, Vec3, Point3
+from nivel import  MapaImagen
+from panda3d.core import WindowProperties, Vec3, Point3, CardMaker, LVector3f
 import random
 
 from direct.showbase.ShowBase import ShowBase
-from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton
 
 from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent, CollisionNode, CollisionBox
 from direct.actor.Actor import Actor
@@ -44,11 +43,14 @@ class Juego(ShowBase):
         self.disableMouse()
 
         self.nivel = 0
-        self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 10, 'vecinos': 5, 'mapa': 'assets/maps/lvl1.png'},
+        self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 1, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png'},
                         {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 20, 'vecinos': 1,'mapa': 'assets/maps/lvl2.png'},
-                        {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 15, 'mapa': 'assets/maps/lvl3.png'}]
+                        {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png'}]
         
         self.jugador = None
+
+        self.card = None
+        
                  
     def impacto(self, a):
         enemigos = self.gestor_nivel.enemigos
@@ -100,25 +102,6 @@ class Juego(ShowBase):
 
         self.taskMgr.add(self.actualizar, 'actualizar')
 
-    
-    # def spawnear_enemigo(self):
-    #     if len(self.enemigos) < self.enemigos_max:
-    #         spawn = random.choice(self.sp_enemigos)
-    #         enemigo = Enemigo(self, f'enemigo_{self.enemigos_id}', spawn, self.enemigos_id)
-    #         self.enemigos.append(enemigo)
-    #         self.accept(f'bala-into-enemigo_balas_{self.enemigos_id}', self.impacto)
-    #         self.enemigos_id += 1
-
-
-    # def spawnear_vecinos(self):
-    #     for i in range(self.cantidad_vecinos):
-    #         spawn = random.choice(self.vecinos_spawn)
-    #         modelo = random.randint(1,5)
-    #         nombre = f'vecino_{i}'
-    #         vecino = Vecino(self, str(modelo), spawn, nombre)
-    #         self.vecinos.append(vecino)
-    #         self.vecinos_spawn.remove(spawn)
-    #         self.accept(f'personaje_obj-into-{nombre}', self.limpiar)
             
     def limpiar(self, colision):
         vecinos = self.gestor_nivel.vecinos
@@ -130,6 +113,29 @@ class Juego(ShowBase):
                 vecino.eliminar()
                 vecinos.remove(vecino)
                 break
+
+        if not vecinos:
+            puerta = self.loader.loadModel('models/box')
+            puerta.reparentTo(self.render)
+            x, y, z = self.gestor_nivel.jugador_spawn
+            puerta.setPos(x,y,z)
+            puerta.setScale(2,2,2)
+            puerta.lookAt(self.jugador.personaje)
+            puerta.setColor(1, 1, 1, 1)
+
+            cn_puerta = CollisionNode('puerta')
+            cn_puerta.addSolid(CollisionBox(Point3(.5, .5, .5), .5, .5, .5))
+            colisionador_puerta = puerta.attachNewNode(cn_puerta)
+            colisionador_puerta.show()
+
+            self.pusher.addCollider(colisionador_puerta, puerta)
+            self.cTrav.addCollider(colisionador_puerta, self.cHandler)
+            self.accept(f'personaje_obj-into-puerta', self.pasar_nivel)
+
+
+    def pasar_nivel(self, colision):
+        print('final')
+        
             
     def menu(self):
         self.menu_opciones.esconder_menu()

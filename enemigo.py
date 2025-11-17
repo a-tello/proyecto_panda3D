@@ -16,8 +16,7 @@ class Enemigo():
         self.nombre = nombre
         self.id = identificador
         self.objetivo = self.juego.jugador.personaje
-        #self.zombie = Actor('assets/models/monkey')
-        self.zombie = Actor('zombie1.glb', {'run': 'zombie1.glb'})
+        self.zombie = Actor('assets/models/zombie1.glb', {'run': 'assets/models/zombie1.glb'})
         self.zombie.getChild(0).setH(180)
 
         self.zombie.loop('run')

@@ -95,10 +95,10 @@ class Personaje():
         self.iconos_vida_true = []
         self.iconos_vida_false = []
         for i in range(self.vida):
-            vida_img_true = OnscreenImage(image = 'vida_completa.png',
+            vida_img_true = OnscreenImage(image = 'assets/objects/vida_completa.png',
                                 pos = (-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
                                 
-            vida_img_false = OnscreenImage(image = 'vida_vacia.png',
+            vida_img_false = OnscreenImage(image = 'assets/objects/vida_vacia.png',
                                 pos=(-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
             
             vida_img_true.setTransparency(True)
@@ -194,32 +194,14 @@ class Personaje():
                 
                 
         if self.teclas['disparar'] and self.cooldown <= 0:                              
-        #     if self.bala_lista.getNumEntries() > 0:
-        #         self.bala_lista.sortEntries()
-        #         impacto = self.bala_lista.getEntry(0)
-        #         hitPos = impacto.getSurfacePoint(self.juego.render)
-
-        #         hitNodePath = impacto.getIntoNodePath()
-        #         print (hitNodePath)
-        #         if hitNodePath.hasPythonTag('owner'):
-        #             hitObject = hitNodePath.getPythonTag('owner')
-        #             hitObject.alterHealth(5*dt)
-
-                
-        #         beamLength = (hitPos - self.personaje.getPos()).length()
-        #         self.bala_modelo.setSy(beamLength)
-
-        #         self.bala_modelo.show()
-        # else:
-        #     self.bala_modelo.hide()
-        
-            bala = self.juego.loader.loadModel('assets/laser/bambooLaser')   
-            bala.setScale(1)
+            
+            bala = self.juego.loader.loadModel("models/misc/sphere")
+            bala.setScale(0.1, 0.5, 0.1)
+            bala.setColor(0,255,0)
             bala.reparentTo(self.juego.render)
-            bala.setPos(self.personaje.getPos()+(0,0,2))     
+            bala.setPos(self.personaje.getPos()+(0,0,1.5))     
             bala.setHpr(self.juego.camera.getHpr())    
 
-            
             bala_nodo = bala.attachNewNode(CollisionNode('bala'))
             bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.3))
             bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
@@ -227,21 +209,9 @@ class Personaje():
             self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
 
             self.balas_activas.append({'modelo': bala, 'velocidad': 40})
-            #print(self.balas_activas,'\n')
             self.cooldown = 0.3  
         
-        # for bala in self.balas_activas:
-        #     modelo = bala['modelo']
-        #     modelo.setY(modelo, bala['velocidad'] * dt)  
-
-        #     bala_nodo = modelo.attachNewNode(CollisionNode('bala'))
-        #     bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.2))
-        #     bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
-        #     bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
-        #     self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
-            
-            #self.juego.cTrav.traverse(self.juego.render)
-            
+ 
         for bala in self.balas_activas[:]:
             modelo = bala['modelo']
             modelo.setY(modelo, bala['velocidad'] * dt)
