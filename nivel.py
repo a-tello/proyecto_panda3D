@@ -3,7 +3,7 @@ from panda3d.core import NodePath, CollisionNode, CollisionBox, Point3, Collisio
 from PIL import Image
 from constantes import *
 
-class Nivel():
+class Mapa():
     def __init__(self, juego):
         self.juego = juego
         self.mapa = []
@@ -40,18 +40,17 @@ class Nivel():
                     self.agregar_colision_pared(cubo_pared)
                     cubo_pared.setPos(x, y, 0)
 
-        #self.agregar_colision_piso(piso)
-
     def agregar_colision_pared(self, nodo):
         nodo_colision = CollisionNode('pared')
         nodo_colision.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 0.5, 0.5, 0.5))
         nodo.attachNewNode(nodo_colision)
 
 
-class MapaImagen(Nivel):
-    def __init__(self, juego, imagen):
+class MapaImagen(Mapa):
+    def __init__(self, juego, imagen, nivel):
         super().__init__(juego)
 
+        self.nivel = nivel
         self.mapeado = {'sp_jugador': (0,0,255), 
                         'sp_vecino': (0,255,0), 
                         'sp_enemigo': (255,0,0),
@@ -73,18 +72,18 @@ class MapaImagen(Nivel):
                     else:                          
                         fila.append(0)
                         if pixel == self.mapeado['sp_jugador']:                            
-                            self.juego.sp_jugador = (x,y,0)
+                            self.nivel.jugador_spawn = (x,y,0)
                         elif pixel == self.mapeado['sp_vecino']:
-                            self.juego.sp_vecinos.append((x,y,0))
+                            self.nivel.vecinos_spawn.append((x,y,0))
                         elif pixel == self.mapeado['sp_enemigo']:
-                            self.juego.sp_enemigos.append((x,y,0))
+                            self.nivel.enemigos_spawn.append((x,y,0))
                             
                 self.mapa.append(fila)
         
             self.crear_escenario(self.mapa)
 
 
-class Laberinto(Nivel):
+class Laberinto(Mapa):
     def __init__(self, juego, ancho=10, alto=10):
         super().__init__(juego)
         self.ancho = ancho

@@ -11,7 +11,7 @@ from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import TextNode
 
 class Personaje():
-    def __init__(self, juego):
+    def __init__(self, juego, spawn):
         
         self.juego = juego
         
@@ -20,13 +20,13 @@ class Personaje():
                             'stand' : 'assets/models/a_p3d_chan_idle',
                             'run' : 'assets/models/a_p3d_chan_run'
                         })
-        self.personaje.setPos(juego.sp_jugador)
+        self.personaje.setPos(spawn)
         self.personaje.getChild(0).setH(180)
         self.personaje.reparentTo(self.juego.render)
         self.personaje.loop('stand')
 
         # ATRIBUTOS
-        self.vida = 10
+        self.vida = 1
         self.velocidad = 5
         self.ataque = 3
 
