@@ -11,7 +11,7 @@ from direct.interval.IntervalGlobal import LerpColorScaleInterval,Sequence
 from direct.gui.OnscreenImage import OnscreenImage
 
 class Enemigo():
-    def __init__(self, juego, nombre, spawn, identificador):
+    def __init__(self, juego, nombre, spawn, identificador, nivel):
         self.juego = juego
         self.nombre = nombre
         self.id = identificador
@@ -34,7 +34,7 @@ class Enemigo():
         # ATRIBUTOS
         self.vida = 10
         self.velocidad = 2
-        self.danio = -1
+        self.danio = -1 * (nivel + 1)
         
         self.distancia_ataque = 1
         self.delay_ataque = 0.5
@@ -91,18 +91,17 @@ class Enemigo():
         morir = LerpColorScaleInterval(self.zombie, 2.0, VBase4(1, 1, 1, 0))
         morir.start()
         morir.setDoneEvent("morir_")
-        self.juego.accept("morir_", self.a)
+        self.juego.accept("morir_", self.eliminar)
 
-    def a(self):
+    def eliminar(self):
+        self.zombie.stop()
         self.sonido_zombie.stop()
         self.zombie.cleanup()
-        self.zombie.remove_node()
+        self.zombie.removeNode()
 
         # transparencia = self.zombie.getColorScale()[3]
         # if transparencia < 1:
 
-    def eliminar(self):
-        self.zombie.remove_node()
 
     def mover(self, dt):
         self.zombie.lookAt(self.juego.jugador.personaje.getPos())

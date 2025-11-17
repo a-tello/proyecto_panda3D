@@ -35,6 +35,7 @@ class Vecino():
             self.vecino.loop('idle')
 
     def eliminar(self):
+        self.vecino.cleanup()
         self.vecino.removeNode()
 
     def accion(self):

@@ -8,6 +8,7 @@ from personaje import Personaje
 
 class Nivel():
     def __init__(self, juego):
+        self.mapa = None
         self.juego = juego
         self.jugador_spawn = Vec3()
         self.vecinos = []
@@ -24,6 +25,9 @@ class Nivel():
         #self.level_guardado = []
 
         self.musica_nivel = None
+        self.sonido_final_nivel = self.juego.loader.loadSfx("assets/sounds/final.ogg")
+        self.sonido_final_nivel.setVolume(0.05)
+
 
     def cargar(self, info_nivel):
 
@@ -46,8 +50,8 @@ class Nivel():
         skybox.setTexture(textura)
         skybox.setPos(-10, -10, 0)
 
-        mapa = MapaImagen(self.juego, img_mapa, self)
-
+        self.mapa = MapaImagen(self.juego, img_mapa, self)
+        
         #ILUMINACION
         ambient = AmbientLight('ambient_light')
         ambient.setColor((0.5, 0.5, 0.5, 1))
@@ -62,7 +66,7 @@ class Nivel():
     def spawnear_enemigos(self, cantidad):
         if len(self.enemigos) < cantidad:
             spawn = random.choice(self.enemigos_spawn)
-            enemigo = Enemigo(self.juego, f'enemigo_{self.enemigos_id}', spawn, self.enemigos_id)
+            enemigo = Enemigo(self.juego, f'enemigo_{self.enemigos_id}', spawn, self.enemigos_id, self.juego.nivel)
             self.enemigos.append(enemigo)
             self.juego.accept(f'bala-into-enemigo_balas_{self.enemigos_id}', self.juego.impacto)
             self.enemigos_id += 1
@@ -75,7 +79,7 @@ class Nivel():
             vecino = Vecino(self.juego, str(modelo), spawn, nombre)
             self.vecinos.append(vecino)
             self.vecinos_spawn.remove(spawn)
-            self.juego.accept(f'personaje_obj-into-{nombre}', self.juego.limpiar)
+            self.juego.accept(f'personaje_obj-into-{nombre}', self.juego.salvar_vecino)
         
     def actualizar_enemigos(self, dt):
         self.temporizador_spawn -= dt
@@ -90,3 +94,19 @@ class Nivel():
         for enemigo in self.enemigos_muertos:
             enemigo.morir()
             self.enemigos_muertos.remove(enemigo) 
+
+    def limpiar_nivel(self):
+        for zombie in self.enemigos:
+            zombie.eliminar()
+        for vecino in self.vecinos:
+            vecino.eliminar()
+        self.mapa.mapa_nodo.removeNode()
+
+        self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []
+
+    def pasar_nivel(self, _):
+        self.juego.taskMgr.remove('actualizar')
+        self.sonido_final_nivel.play()
+        self.limpiar_nivel()
+        self.juego.nivel += 1
+        self.juego.jugar()

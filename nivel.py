@@ -7,11 +7,10 @@ class Mapa():
     def __init__(self, juego):
         self.juego = juego
         self.mapa = []
+        self.mapa_nodo = None
+
     
-    def crear_escenario(self, matriz):
-        
-        # TODO funcion
-        
+    def crear_escenario(self, matriz):        
         pared = self.juego.loader.loadModel('models/box')
         pared.setScale(1, 1, 3)
         textura_pared = self.juego.loader.loadTexture('assets/Environment/tex/pared.jpg')
@@ -27,6 +26,7 @@ class Mapa():
         
         mapa_np = NodePath('mapa')
         mapa_np.reparentTo(self.juego.render)
+        self.mapa_nodo = mapa_np
 
         alto = len(matriz)
         ancho = len(matriz[0])

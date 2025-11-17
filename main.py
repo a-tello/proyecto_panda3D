@@ -28,9 +28,6 @@ class Juego(ShowBase):
         # SONIDOS
         self.sonido_item = self.loader.loadSfx("assets/sounds/item.ogg")
         self.sonido_item.setVolume(0.03)
-        self.sonido_final_nivel = self.loader.loadSfx("assets/sounds/final.ogg")
-        self.sonido_final_nivel.setVolume(0.05)
-
 
         # MENU
         self.menu_principal = MenuPrincipal(self)
@@ -62,7 +59,6 @@ class Juego(ShowBase):
         enemigos_muertos = self.gestor_nivel.enemigos_muertos
         id_enemigo = a.getIntoNode().getName().split('_')[-1]
         bala_np = a.getFromNodePath().get_parent()
-        #enemigo_np = a.getIntoNodePath().get_parent()
         bala_np.removeNode()
         for enemigo in enemigos:
             if id_enemigo == str(enemigo.id):
@@ -71,19 +67,13 @@ class Juego(ShowBase):
                     enemigos.remove(enemigo)
                     enemigos_muertos.append(enemigo)
                     enemigo.morir()
-                    #enemigo.eliminar()
-                    #enemigo_np.removeNode()
 
     def actualizar(self, task):
+        print(self.nivel)
         dt = self.clock.getDt()
         
         self.jugador.mover(dt)
-        
-        
-        
         self.gestor_nivel.actualizar_enemigos(dt)
-        
-
         self.cTrav.traverse(self.render)
 
         if self.jugador.vida < 1:
@@ -108,7 +98,7 @@ class Juego(ShowBase):
         self.taskMgr.add(self.actualizar, 'actualizar')
 
             
-    def limpiar(self, colision):
+    def salvar_vecino(self, colision):
         self.sonido_item.play()
         vecinos = self.gestor_nivel.vecinos
 
@@ -136,12 +126,10 @@ class Juego(ShowBase):
 
             self.pusher.addCollider(colisionador_puerta, puerta)
             self.cTrav.addCollider(colisionador_puerta, self.cHandler)
-            self.accept(f'personaje_obj-into-puerta', self.pasar_nivel)
+            self.accept(f'personaje_obj-into-puerta', self.gestor_nivel.pasar_nivel)
 
 
-    def pasar_nivel(self, colision):
-        self.sonido_final_nivel.play()
-        print('final')
+
         
             
     def menu(self):

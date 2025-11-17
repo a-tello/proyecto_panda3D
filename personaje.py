@@ -26,8 +26,8 @@ class Personaje():
         self.personaje.loop('stand')
 
         # ATRIBUTOS
-        self.vida = 1
-        self.velocidad = 5
+        self.vida = 10
+        self.velocidad = 10
         self.ataque = 3
 
         # TECLAS
@@ -56,15 +56,14 @@ class Personaje():
         self.angulo_vertical = 0  
         self.ultimo_x = self.juego.win.getPointer(0).getX()
         self.ultimo_Y = self.juego.win.getPointer(0).getY()
-        self.velocidad = 5
         self.velocidad_rotacion = 120.0
         self.sensibilidad_mouse = 0.3
         self.puntaje = 0
 
         # COLISION (con paredes y enemigos)
         cn_jugador = CollisionNode('personaje')
-        cn_jugador.addSolid(CollisionSphere(0, 0, 1, .3))
-        cn_jugador.addSolid(CollisionBox(Point3(0, 0, 1), .3, .3, 1))
+        cn_jugador.addSolid(CollisionSphere(0, 0, 1, 0.3))
+        cn_jugador.addSolid(CollisionBox(Point3(0, 0, 1), 0.3, 0.3, 1))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
         cn_jugador.setFromCollideMask(BitMask32.bit(1) | BitMask32.bit(2) )
