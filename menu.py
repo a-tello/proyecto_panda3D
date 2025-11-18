@@ -117,16 +117,16 @@ class PantallaFinal(Menu):
     def __init__(self, juego, puntos):
         super().__init__(juego)
         
-        self.menu_fondo = DirectDialog(frameColor = (0, 0, 0, 255), frameSize = (-1, 1, -1, 1), parent = juego.render2d, fadeScreen = 0.4)
-        self.menu = DirectDialog(frameColor = (0, 0, 0, 0), fadeScreen = 0.4)
+        #self.menu_fondo = DirectDialog(frameColor = (0, 0, 0, 255), frameSize = (-1, 1, -1, 1), parent = juego.render2d, fadeScreen = 0.4)
+        #self.menu = DirectDialog(frameColor = (0, 0, 0, 0), fadeScreen = 0.4)
 
         title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
                         relief = None,  text_fg = (1, 1, 1, 1))
         
-        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
+        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft,parent = self.menu)
 
 
-        btn = DirectButton(text = 'Reiniciar', pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
+        btn = DirectButton(text = 'Reiniciar', command = juego.jugar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
                         frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton)
         btn.setTransparency(True)
 

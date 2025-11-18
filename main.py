@@ -36,6 +36,9 @@ class Juego(ShowBase):
         self.menu_principal = MenuPrincipal(self)
         self.menu_opciones = MenuOpciones(self)
         self.menu_opciones.esconder_menu()
+        self.menu_pausa = MenuPausa(self)
+        self.menu_pausa.esconder_menu()
+        self.pantalla_final = None
 
         # COLISIONES
         self.cTrav = CollisionTraverser()
@@ -54,7 +57,10 @@ class Juego(ShowBase):
                         {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 0, 'vecinos': 1,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg'}]
         
+        self.estado = 0
         self.jugador = None
+        self.accept('escape', self.pausa)
+        
         
                  
     def impacto(self, colision):
@@ -75,6 +81,7 @@ class Juego(ShowBase):
         #             enemigo.morir()
 
     def actualizar(self, task):
+        print(self.estado)
         dt = self.clock.getDt()
         
         self.jugador.mover(dt)
@@ -83,7 +90,12 @@ class Juego(ShowBase):
 
         if self.jugador.vida < 1:
             self.taskMgr.remove('actualizar')
-            pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+            self.gestor_nivel.limpiar_nivel()
+            self.jugador.personaje.removeNode()
+            self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+            self.jugador = None
+            self.pantalla.setCursorHidden(False)
+            self.win.requestProperties(self.pantalla)
 
 
         return task.cont
@@ -92,6 +104,8 @@ class Juego(ShowBase):
         self.menu_principal.esconder_menu()
         self.pantalla.setCursorHidden(True)
         self.win.requestProperties(self.pantalla)
+        if self.pantalla_final is not None:
+            self.pantalla_final.esconder_menu()
 
         OnscreenText(text = '+', pos = (0,0,0), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
@@ -99,9 +113,8 @@ class Juego(ShowBase):
         self.gestor_nivel = Nivel(self)
         nivel = self.niveles[self.nivel]
         self.gestor_nivel.cargar(nivel)
-
+        self.estado = 1
         self.taskMgr.add(self.actualizar, 'actualizar')
-
             
     def salvar_vecino(self, colision):
         self.sonido_item.play()
@@ -118,13 +131,37 @@ class Juego(ShowBase):
         if not vecinos:
             self.gestor_nivel.crear_final()
 
+    def pausa(self):
+        if self.estado == 1:
+            self.pantalla.setCursorHidden(False)
+            self.win.requestProperties(self.pantalla)
+            self.taskMgr.remove('actualizar')
+            self.menu_pausa.mostrar_menu()
+            self.estado = 2
+        elif self.estado == 2:
+            self.pantalla.setCursorHidden(True)
+            self.win.requestProperties(self.pantalla)
+            self.taskMgr.add(self.actualizar, 'actualizar')
+            self.menu_pausa.esconder_menu()
+            self.estado = 1
+        elif self.estado == 3:
+            self.menu_pausa.mostrar_menu()
+            self.menu_opciones.esconder_menu()
+            self.estado = 2
             
+        
     def menu(self):
+        self.estado = 0
         self.menu_opciones.esconder_menu()
+        self.menu_pausa.esconder_menu()
+        if self.pantalla_final is not None:
+            self.pantalla_final.esconder_menu()
         self.menu_principal.mostrar_menu()
         
     def opciones(self):
+        self.estado = 3
         self.menu_principal.esconder_menu()
+        self.menu_pausa.esconder_menu()
         self.menu_opciones.mostrar_menu()
         
     def cambiar_pantalla(self, op):

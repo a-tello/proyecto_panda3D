@@ -128,7 +128,8 @@ class Nivel():
         self.mapa.mapa_nodo.removeNode()
 
         self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []
-        self.puerta_final.puerta.removeNode()
+        if self.puerta_final:
+            self.puerta_final.puerta.removeNode()
 
     def pasar_nivel(self, _):
         self.juego.taskMgr.remove('actualizar')

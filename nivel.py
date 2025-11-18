@@ -26,8 +26,8 @@ class Mapa():
         pared.setTexture(textura_pared, 1)
 
         piso = self.juego.loader.loadModel('models/box')
-        piso.setScale(ancho, alto, 0)
-        piso.setPos(0,0,0)      
+        piso.setScale(ancho, alto, 1)
+        piso.setPos(0,0,-1)      
         textura_piso = self.juego.loader.loadTexture('assets/Environment/tex/tierra.jpg')
         textura_piso.setWrapU(textura_piso.WM_repeat)
         textura_piso.setWrapV(textura_piso.WM_repeat)
