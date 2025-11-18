@@ -58,11 +58,10 @@ class Enemigo():
         # COLISION (balas)
         zombie_balas_cn = CollisionNode(f'enemigo_balas_{identificador}')
         #zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
-        zombie_balas_cn.addSolid(CollisionBox(Point3(0, 0, 1), .2, .2, 1))
+        zombie_balas_cn.addSolid(CollisionBox(Point3(0, .2, 1), .3, .3, 1))
         self.colisionador_balas = self.zombie.attachNewNode(zombie_balas_cn)
         zombie_balas_cn.setFromCollideMask(BitMask32.allOff())
         zombie_balas_cn.setIntoCollideMask(BitMask32.bit(3))
-
 
         self.juego.cTrav.addCollider(self.colisionador_balas, juego.cHandler)
 

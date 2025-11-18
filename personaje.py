@@ -1,5 +1,6 @@
 import math
 import random
+from objetos import Bala
 from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
@@ -86,7 +87,6 @@ class Personaje():
         # PUNTAJE
         self.puntaje_pantalla = OnscreenText(text = '0', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
-        self.balas_activas = []
         self.cooldown = 0
         
 
@@ -196,30 +196,34 @@ class Personaje():
                 
         if self.teclas['disparar'] and self.cooldown <= 0:                              
             self.sonido_disparo.play()
-            bala = self.juego.loader.loadModel("models/misc/sphere")
-            bala.setScale(0.1, 0.5, 0.1)
-            bala.setColor(0,255,0)
-            bala.reparentTo(self.juego.render)
-            bala.setPos(self.personaje.getPos()+(0,0,1.5))     
-            bala.setHpr(self.juego.camera.getHpr())    
+            bala = Bala(self)
+            self.juego.gestor_nivel.balas_activas.append({'modelo': bala, 'velocidad': 100})
+            
+            # bala = self.juego.loader.loadModel("models/misc/sphere")
+            # bala.setScale(0.1, 0.5, 0.1)
+            # bala.setColor(0,255,0)
+            # bala.reparentTo(self.juego.render)
+            # bala.setPos(self.personaje.getPos()+(0,0,1.5))     
+            # bala.setHpr(self.juego.camera.getHpr())    
 
-            bala_nodo = bala.attachNewNode(CollisionNode('bala'))
-            bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.3))
-            bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
-            bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
-            self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
+            # bala_nodo = bala.attachNewNode(CollisionNode('bala'))
+            # bala_nodo.node().addSolid(CollisionSphere(0, 0, 0, 0.3))
+            # bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
+            # bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
+            # self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
 
-            self.balas_activas.append({'modelo': bala, 'velocidad': 40})
-            self.cooldown = 0.3  
+            # self.balas_activas.append({'modelo': bala, 'velocidad': 40})
+            self.cooldown = 1
         
- 
-        for bala in self.balas_activas[:]:
-            modelo = bala['modelo']
-            modelo.setY(modelo, bala['velocidad'] * dt)
+        self.juego.gestor_nivel.actualizar_balas(dt)
+        # for bala in self.juego.gestor_nivel.balas_activas[:]:
+        #     modelo = bala['modelo'].bala
+        #     modelo.setY(modelo, bala['velocidad'] * dt)
 
-            if (modelo.getPos() - self.personaje.getPos()).length() > 200:
-                modelo.removeNode()
-                self.balas_activas.remove(bala)
+        #     if (modelo.getPos() - self.personaje.getPos()).length() > 50:
+        #         modelo.removeNode()
+        #         print(self.juego.gestor_nivel.balas_activas)
+        #         self.juego.gestor_nivel.balas_activas.remove(bala)
             
         if self.cooldown > 0:
             self.cooldown -= dt

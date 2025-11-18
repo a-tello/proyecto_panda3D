@@ -72,7 +72,6 @@ class Juego(ShowBase):
         #             enemigo.morir()
 
     def actualizar(self, task):
-        print(self.nivel)
         dt = self.clock.getDt()
         
         self.jugador.mover(dt)

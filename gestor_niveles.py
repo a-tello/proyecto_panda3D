@@ -23,6 +23,9 @@ class Nivel():
         self.intervalo_spawn = 2
         self.temporizador_spawn = 2
         #self.level_guardado = []
+        
+        self.balas_activas = []
+        
 
         self.musica_nivel = None
         self.sonido_final_nivel = self.juego.loader.loadSfx("assets/sounds/final.ogg")
@@ -102,6 +105,15 @@ class Nivel():
                 if enemigo.vida < 1:
                     self.enemigos.remove(enemigo)
                     self.enemigos_muertos.append(enemigo)
+    
+    def actualizar_balas(self, dt):
+        for bala in self.balas_activas[:]:
+            modelo = bala['modelo'].bala
+            modelo.setY(modelo, bala['velocidad'] * dt)
+
+            if (modelo.getPos() - self.juego.jugador.personaje.getPos()).length() > 50:
+                modelo.removeNode()
+                self.balas_activas.remove(bala)
 
     def limpiar_nivel(self):
         for zombie in self.enemigos:
