@@ -3,7 +3,7 @@ from panda3d.core import TextNode
 from gestor_niveles import Nivel
 from menu import *
 from panda3d.core import WindowProperties, Point3
-
+from objetos import Puerta
 from direct.showbase.ShowBase import ShowBase
 
 from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent, CollisionNode, CollisionBox
@@ -48,7 +48,7 @@ class Juego(ShowBase):
 
         self.nivel = 0
         self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 1, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg'},
-                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 20, 'vecinos': 1,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
+                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 0, 'vecinos': 1,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg'}]
         
         self.jugador = None
@@ -113,22 +113,7 @@ class Juego(ShowBase):
                 break
 
         if not vecinos:
-            puerta = self.loader.loadModel('models/box')
-            puerta.reparentTo(self.render)
-            x, y, z = self.gestor_nivel.jugador_spawn
-            puerta.setPos(x,y,z)
-            puerta.setScale(2,2,2)
-            puerta.lookAt(self.jugador.personaje)
-            puerta.setColor(1, 1, 1, 1)
-
-            cn_puerta = CollisionNode('puerta')
-            cn_puerta.addSolid(CollisionBox(Point3(.5, .5, .5), .5, .5, .5))
-            colisionador_puerta = puerta.attachNewNode(cn_puerta)
-            colisionador_puerta.show()
-
-            self.pusher.addCollider(colisionador_puerta, puerta)
-            self.cTrav.addCollider(colisionador_puerta, self.cHandler)
-            self.accept(f'personaje_obj-into-puerta', self.gestor_nivel.pasar_nivel)
+            self.gestor_nivel.crear_final()
 
 
 

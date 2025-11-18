@@ -5,7 +5,7 @@ from enemigo import Enemigo
 from panda3d.core import Vec3, Point3
 from vecino import Vecino
 from personaje import Personaje
-
+from objetos import *
 class Nivel():
     def __init__(self, juego):
         self.mapa = None
@@ -25,6 +25,7 @@ class Nivel():
         #self.level_guardado = []
         
         self.balas_activas = []
+        self.puerta_final = None
         
 
         self.musica_nivel = None
@@ -33,15 +34,19 @@ class Nivel():
 
 
     def cargar(self, info_nivel):
-
         self.musica_nivel = self.juego.loader.loadSfx(info_nivel['musica'])
         self.musica_nivel.setLoop(True)
         self.musica_nivel.setVolume(0.075)
         self.musica_nivel.play()
         self.cargar_mapa(info_nivel['mapa'])
-        self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
+        
+        if self.juego.jugador is None:
+            self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
+        
         self.spawnear_enemigos(info_nivel['enemigos'])
         self.spawnear_vecinos(info_nivel['vecinos'])
+        
+            
 
     def cargar_mapa(self, img_mapa):
         # ENTORNO
@@ -123,6 +128,7 @@ class Nivel():
         self.mapa.mapa_nodo.removeNode()
 
         self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []
+        self.puerta_final.puerta.removeNode()
 
     def pasar_nivel(self, _):
         self.juego.taskMgr.remove('actualizar')
@@ -130,3 +136,7 @@ class Nivel():
         self.limpiar_nivel()
         self.juego.nivel += 1
         self.juego.jugar()
+        
+    def crear_final(self):
+        self.puerta_final = Puerta(self.juego)
+        self.juego.accept(f'personaje_obj-into-puerta', self.pasar_nivel)

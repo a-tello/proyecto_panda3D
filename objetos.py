@@ -1,4 +1,4 @@
-from panda3d.core import CollisionSphere, CollisionNode
+from panda3d.core import CollisionSphere, CollisionNode, CollisionBox, Point3
 from panda3d.core import BitMask32
 
 
@@ -17,5 +17,23 @@ class Bala():
         bala_nodo.node().setFromCollideMask(BitMask32.bit(3))
         bala_nodo.node().setIntoCollideMask(BitMask32.allOff())
         gestor.juego.cTrav.addCollider(bala_nodo, gestor.juego.cHandler)
+        
+class Puerta():
+    def __init__(self, juego):
+        self.puerta = juego.loader.loadModel('models/box')
+        self.puerta.reparentTo(juego.render)
+        x, y, z = juego.gestor_nivel.jugador_spawn
+        self.puerta.setPos(x,y,z)
+        self.puerta.setScale(2,2,2)
+        self.puerta.lookAt(juego.jugador.personaje)
+        self.puerta.setColor(1, 1, 1, 1)
+
+        cn_puerta = CollisionNode('puerta')
+        cn_puerta.addSolid(CollisionBox(Point3(.5, .5, .5), .5, .5, .5))
+        colisionador_puerta = self.puerta.attachNewNode(cn_puerta)
+        colisionador_puerta.show()
+        
+        juego.pusher.addCollider(colisionador_puerta, self.puerta)
+        juego.cTrav.addCollider(colisionador_puerta, juego.cHandler)
 
         
