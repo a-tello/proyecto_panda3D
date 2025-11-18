@@ -54,19 +54,22 @@ class Juego(ShowBase):
         self.jugador = None
         
                  
-    def impacto(self, a):
-        enemigos = self.gestor_nivel.enemigos
-        enemigos_muertos = self.gestor_nivel.enemigos_muertos
-        id_enemigo = a.getIntoNode().getName().split('_')[-1]
-        bala_np = a.getFromNodePath().get_parent()
+    def impacto(self, colision):
+        # enemigos = self.gestor_nivel.enemigos
+        # enemigos_muertos = self.gestor_nivel.enemigos_muertos
+        id_enemigo = colision.getIntoNode().getName().split('_')[-1]
+        bala_np = colision.getFromNodePath().get_parent()
         bala_np.removeNode()
-        for enemigo in enemigos:
-            if id_enemigo == str(enemigo.id):
-                enemigo.actualizar_vida(-self.jugador.ataque)
-                if enemigo.vida < 1:
-                    enemigos.remove(enemigo)
-                    enemigos_muertos.append(enemigo)
-                    enemigo.morir()
+        
+        
+        self.gestor_nivel.impacto_enemigos(id_enemigo)
+        # for enemigo in enemigos:
+        #     if id_enemigo == str(enemigo.id):
+        #         enemigo.actualizar_vida(-self.jugador.ataque)
+        #         if enemigo.vida < 1:
+        #             enemigos.remove(enemigo)
+        #             enemigos_muertos.append(enemigo)
+        #             enemigo.morir()
 
     def actualizar(self, task):
         print(self.nivel)

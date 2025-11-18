@@ -94,6 +94,14 @@ class Nivel():
         for enemigo in self.enemigos_muertos:
             enemigo.morir()
             self.enemigos_muertos.remove(enemigo) 
+    
+    def impacto_enemigos(self, id_enemigo):
+        for enemigo in self.enemigos:
+            if id_enemigo == str(enemigo.id):
+                enemigo.actualizar_vida(-self.juego.jugador.ataque)
+                if enemigo.vida < 1:
+                    self.enemigos.remove(enemigo)
+                    self.enemigos_muertos.append(enemigo)
 
     def limpiar_nivel(self):
         for zombie in self.enemigos:

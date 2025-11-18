@@ -88,13 +88,13 @@ class Enemigo():
     
 
     def morir(self):
+        self.zombie.stop()
         morir = LerpColorScaleInterval(self.zombie, 2.0, VBase4(1, 1, 1, 0))
         morir.start()
         morir.setDoneEvent("morir_")
         self.juego.accept("morir_", self.eliminar)
 
     def eliminar(self):
-        self.zombie.stop()
         self.sonido_zombie.stop()
         self.zombie.cleanup()
         self.zombie.removeNode()
