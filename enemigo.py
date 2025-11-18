@@ -66,17 +66,20 @@ class Enemigo():
         self.juego.cTrav.addCollider(self.colisionador_balas, juego.cHandler)
 
         # COLISION DE ATAQUE (nodo)
-        self.ataque = CollisionSegment(0,0,0,1,0,0)
+        self.ataque = CollisionSegment(0,0.5,1.2,0,3,1.2)
         ataque_cn = CollisionNode('ataque')
         ataque_cn.addSolid(self.ataque)
+        self.ataque_np = self.zombie.attachNewNode(ataque_cn)
+        #self.ataque_np = juego.render.attachNewNode(ataque_cn)
         # MASCARA DE COLISION (para no atacar a otros enemigos)
         ataque_cn.setFromCollideMask(BitMask32().bit(1))
         ataque_cn.setIntoCollideMask(BitMask32().allOff())
+        self.ataque_np.show()
 
-        self.ataque_np = juego.render.attachNewNode(ataque_cn)
         self.lista_ataques = CollisionHandlerQueue()
 
         juego.cTrav.addCollider(self.ataque_np, self.lista_ataques)
+
 
 
     def actualizar_vida(self, danio):
@@ -98,9 +101,6 @@ class Enemigo():
         self.zombie.cleanup()
         self.zombie.removeNode()
 
-        # transparencia = self.zombie.getColorScale()[3]
-        # if transparencia < 1:
-
 
     def mover(self, dt):
         self.zombie.lookAt(self.juego.jugador.personaje.getPos())
@@ -117,8 +117,8 @@ class Enemigo():
             velocidad = 3
             avance = self.zombie.getPos() + direccion_objetivo * velocidad * dt
 
-            self.ataque.setPointA(self.zombie.getPos())
-            self.ataque.setPointB(self.zombie.getPos() + direccion_objetivo * self.distancia_ataque)
+            #self.ataque.setPointA(self.zombie.getPos() + Point3(0,0,2))
+            #self.ataque.setPointB(Point3(0,0,2) + direccion_objetivo * self.distancia_ataque)
         
             if distancia < self.distancia_ataque:
                 self.delay_ataque -= dt
@@ -130,8 +130,8 @@ class Enemigo():
                         if nodo_impacto.hasPythonTag('owner'):
                             objetivo = nodo_impacto.getPythonTag('owner')
                             objetivo.actualizar_vida(self.danio)
-                            self.delay_ataque = 1
-        
+                            self.delay_ataque = 0.5
+    
         else:
             if self.sonido_zombie.status() == AudioSound.PLAYING:
                 self.sonido_zombie.stop()
