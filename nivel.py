@@ -11,6 +11,13 @@ class Mapa():
 
     
     def crear_escenario(self, matriz):        
+        mapa_np = NodePath('mapa')
+        mapa_np.reparentTo(self.juego.render)
+        self.mapa_nodo = mapa_np
+
+        alto = len(matriz)
+        ancho = len(matriz[0])
+        
         pared = self.juego.loader.loadModel('models/box')
         pared.setScale(1, 1, 3)
         textura_pared = self.juego.loader.loadTexture('assets/Environment/tex/pared.jpg')
@@ -18,23 +25,21 @@ class Mapa():
         textura_pared.setWrapV(textura_pared.WM_repeat)
         pared.setTexture(textura_pared, 1)
 
-        piso = self.juego.loader.loadModel('models/box')        
+        piso = self.juego.loader.loadModel('models/box')
+        piso.setScale(ancho, alto, 0)
+        piso.setPos(0,0,0)      
         textura_piso = self.juego.loader.loadTexture('assets/Environment/tex/tierra.jpg')
         textura_piso.setWrapU(textura_piso.WM_repeat)
         textura_piso.setWrapV(textura_piso.WM_repeat)
         piso.setTexture(textura_piso, 1)
         
-        mapa_np = NodePath('mapa')
-        mapa_np.reparentTo(self.juego.render)
-        self.mapa_nodo = mapa_np
+        piso.copyTo(mapa_np)
 
-        alto = len(matriz)
-        ancho = len(matriz[0])
-
+        
         for y in range(alto):
             for x in range(ancho):
-                cubo_piso = piso.copyTo(mapa_np)
-                cubo_piso.setPos(x,y,-1)
+                #cubo_piso = piso.copyTo(mapa_np)
+                #cubo_piso.setPos(x,y,-1)
                 if matriz[y][x] == 1:
                     cubo_pared = pared.copyTo(mapa_np)
                     self.agregar_colision_pared(cubo_pared)

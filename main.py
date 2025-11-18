@@ -13,6 +13,9 @@ class Juego(ShowBase):
     def __init__(self):
         super().__init__()
         
+        # TEST RENDIMIENTO
+        self.setFrameRateMeter(True)
+
         # PANTALLA
         self.pantalla = WindowProperties()
         self.pantalla.setSize(800,600)
@@ -115,9 +118,6 @@ class Juego(ShowBase):
         if not vecinos:
             self.gestor_nivel.crear_final()
 
-
-
-        
             
     def menu(self):
         self.menu_opciones.esconder_menu()
