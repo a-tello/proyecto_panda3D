@@ -20,7 +20,6 @@ class Enemigo():
         self.zombie.getChild(0).setH(180)
 
         self.zombie.loop('run')
-        #self.zombie.setPlayRate(.2, "run")
         self.sonido_zombie = juego.loader.loadSfx("assets/sounds/zombie.ogg")
         self.sonido_zombie.setVolume(0.02)
         self.sonido_zombie.setLoop(True)
@@ -29,15 +28,17 @@ class Enemigo():
         self.zombie.reparentTo(juego.render)
         self.zombie.setPos(spawn)
         self.zombie.setScale(1.2)
-        self.zombie.setTransparency(True)  # Habilita la transparencia para el modelo
+        self.zombie.setTransparency(True)
 
         # ATRIBUTOS
         self.vida = 10
         self.velocidad = 2
         self.danio = -1 * (nivel + 1)
         
-        self.distancia_ataque = 1
+        self.distancia_ataque = 1.2
         self.delay_ataque = 0.5
+
+        self.puntos = 100
 
         # MOVIMIENTO RANDOM
         self.direccion_random = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
@@ -74,7 +75,6 @@ class Enemigo():
         # MASCARA DE COLISION (para no atacar a otros enemigos)
         ataque_cn.setFromCollideMask(BitMask32().bit(1))
         ataque_cn.setIntoCollideMask(BitMask32().allOff())
-        self.ataque_np.show()
 
         self.lista_ataques = CollisionHandlerQueue()
 

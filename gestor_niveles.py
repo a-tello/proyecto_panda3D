@@ -6,14 +6,16 @@ from panda3d.core import Vec3, Point3
 from vecino import Vecino
 from personaje import Personaje
 from objetos import *
+from interfaz import Interfaz
 class Nivel():
     def __init__(self, juego):
-        self.mapa = None
         self.juego = juego
+        self.gui = None
+        
+        self.mapa = None
         self.jugador_spawn = Vec3()
         self.vecinos = []
         self.vecinos_spawn = []
-        self.jugador = None
 
         self.enemigos = []
         self.enemigos_spawn = []
@@ -22,7 +24,6 @@ class Nivel():
         self.enemigos_max = juego.niveles[juego.nivel]['enemigos']
         self.intervalo_spawn = 2
         self.temporizador_spawn = 2
-        #self.level_guardado = []
         
         self.balas_activas = []
         self.puerta_final = None
@@ -36,15 +37,20 @@ class Nivel():
     def cargar(self, info_nivel):
         self.musica_nivel = self.juego.loader.loadSfx(info_nivel['musica'])
         self.musica_nivel.setLoop(True)
-        self.musica_nivel.setVolume(0.075)
+        self.musica_nivel.setVolume(self.juego.musica_volumen)
         self.musica_nivel.play()
+
         self.cargar_mapa(info_nivel['mapa'])
         
         if self.juego.jugador is None:
             self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
-        
+        print(info_nivel['enemigos'])
         self.spawnear_enemigos(info_nivel['enemigos'])
         self.spawnear_vecinos(info_nivel['vecinos'])
+        
+        if self.gui is None:
+            self.gui = Interfaz(self.juego)
+            self.gui.crear_GUI()
         
             
 
@@ -69,7 +75,6 @@ class Nivel():
         dlight.setColor((1, 1, 1, 1))
         dlight.setDirection(Point3(1, -1, -1))
         self.juego.render.setLight(self.juego.render.attachNewNode(dlight))
-
 
     def spawnear_enemigos(self, cantidad):
         if len(self.enemigos) < cantidad:
@@ -110,6 +115,7 @@ class Nivel():
                 if enemigo.vida < 1:
                     self.enemigos.remove(enemigo)
                     self.enemigos_muertos.append(enemigo)
+                    self.juego.jugador.actualizar_puntos(enemigo.puntos)
     
     def actualizar_balas(self, dt):
         for bala in self.balas_activas[:]:
@@ -121,22 +127,29 @@ class Nivel():
                 self.balas_activas.remove(bala)
 
     def limpiar_nivel(self):
-        for zombie in self.enemigos:
-            zombie.eliminar()
         for vecino in self.vecinos:
             vecino.eliminar()
-        self.mapa.mapa_nodo.removeNode()
+        for zombie in self.enemigos:
+            zombie.eliminar()
+            self.enemigos.remove(zombie)
 
+        self.mapa.mapa_nodo.removeNode()
         self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []
         if self.puerta_final:
             self.puerta_final.puerta.removeNode()
 
     def pasar_nivel(self, _):
         self.juego.taskMgr.remove('actualizar')
+        self.musica_nivel.stop()
         self.sonido_final_nivel.play()
         self.limpiar_nivel()
         self.juego.nivel += 1
-        self.juego.jugar()
+        self.gui.inicializar()
+        self.juego.jugador.vida = self.juego.jugador.vida_max
+        self.cargar(self.juego.niveles[self.juego.nivel])
+        self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
+
+        # self.juego.jugar()
         
     def crear_final(self):
         self.puerta_final = Puerta(self.juego)

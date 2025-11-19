@@ -3,6 +3,8 @@ from panda3d.core import TextNode
 from gestor_niveles import Nivel
 from menu import *
 from panda3d.core import WindowProperties, Point3
+from panda3d.core import TransparencyAttrib
+from direct.interval.LerpInterval import LerpColorScaleInterval
 from objetos import Puerta
 from direct.showbase.ShowBase import ShowBase
 
@@ -25,20 +27,37 @@ class Juego(ShowBase):
         # MUSICA
         self.musica_menu = self.loader.loadMusic("assets/sounds/menu_music.ogg")
         self.musica_menu.setLoop(True)
-        self.musica_menu.setVolume(0.075)
+        #self.musica_volumen = 0.075
+        self.musica_volumen = 0.0
+        self.musica_menu.setVolume(self.musica_volumen)
         self.musica_menu.play()
 
         # SONIDOS
         self.sonido_item = self.loader.loadSfx("assets/sounds/item.ogg")
         self.sonido_item.setVolume(0.03)
 
+
+        # FONDO
+        # aspectRatio = self.getAspectRatio()
+        # self.fondo = OnscreenImage("fondo.jpg", pos=(-.2, -1, 0), scale=(aspectRatio, 1, 1) )
+        # self.fondo.reparentTo(self.render2d)
+        # self.fondo.setTransparency(TransparencyAttrib.M_alpha)
+        # self.fondo.setDepthWrite(False)
+        # self.fondo.setDepthTest(False)
+        # self.fondo.setColorScale(1, 1, 1, 0)
+        # self.aparcer(self.fondo, 6)
+
         # MENU
         self.menu_principal = MenuPrincipal(self)
+        # self.menu_principal.menu.setColorScale(1, 1, 1, 0)   
+        # self.menu_principal.esconder_menu()
         self.menu_opciones = MenuOpciones(self)
         self.menu_opciones.esconder_menu()
         self.menu_pausa = MenuPausa(self)
         self.menu_pausa.esconder_menu()
         self.pantalla_final = None
+        # self.aparcer(self.menu_principal.menu, 8)
+        # self.taskMgr.doMethodLater(6, self.inicio, "show_menu_task")
 
         # COLISIONES
         self.cTrav = CollisionTraverser()
@@ -53,16 +72,53 @@ class Juego(ShowBase):
         self.disableMouse()
 
         self.nivel = 0
-        self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 1, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg'},
-                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 0, 'vecinos': 1,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
+        self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 2, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg'},
+                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg'}]
         
         self.estado = 0
         self.jugador = None
+        self.gestor_nivel = None
         self.accept('escape', self.pausa)
+
+    
+
+    def actualizar(self, task):
+        dt = self.clock.getDt()
         
-        
-                 
+        self.jugador.mover(dt)
+        self.gestor_nivel.actualizar_enemigos(dt)
+        self.cTrav.traverse(self.render)
+
+        # TODO
+        if self.jugador.vida < 1:
+            self.taskMgr.remove('actualizar')
+            self.gestor_nivel.limpiar_nivel()
+            self.jugador.personaje.removeNode()
+            self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+            self.jugador = None
+            self.pantalla.setCursorHidden(False)
+            self.win.requestProperties(self.pantalla)
+
+        return task.cont
+            
+
+    def jugar(self):
+        #self.fondo.hide()
+        self.menu_principal.esconder_menu()
+        self.pantalla.setCursorHidden(True)
+        self.win.requestProperties(self.pantalla)
+        # if self.pantalla_final is not None:
+        #     self.pantalla_final.esconder_menu()
+        self.musica_menu.stop()
+
+        self.gestor_nivel = Nivel(self)
+        nivel = self.niveles[self.nivel]
+        self.gestor_nivel.cargar(nivel)
+        self.estado = 1
+        self.taskMgr.add(self.actualizar, 'actualizar')
+
+
     def impacto(self, colision):
         # enemigos = self.gestor_nivel.enemigos
         # enemigos_muertos = self.gestor_nivel.enemigos_muertos
@@ -80,48 +136,13 @@ class Juego(ShowBase):
         #             enemigos_muertos.append(enemigo)
         #             enemigo.morir()
 
-    def actualizar(self, task):
-        print(self.estado)
-        dt = self.clock.getDt()
-        
-        self.jugador.mover(dt)
-        self.gestor_nivel.actualizar_enemigos(dt)
-        self.cTrav.traverse(self.render)
-
-        if self.jugador.vida < 1:
-            self.taskMgr.remove('actualizar')
-            self.gestor_nivel.limpiar_nivel()
-            self.jugador.personaje.removeNode()
-            self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
-            self.jugador = None
-            self.pantalla.setCursorHidden(False)
-            self.win.requestProperties(self.pantalla)
-
-
-        return task.cont
-
-    def jugar(self):
-        self.menu_principal.esconder_menu()
-        self.pantalla.setCursorHidden(True)
-        self.win.requestProperties(self.pantalla)
-        if self.pantalla_final is not None:
-            self.pantalla_final.esconder_menu()
-
-        OnscreenText(text = '+', pos = (0,0,0), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
-
-        self.musica_menu.stop()
-        self.gestor_nivel = Nivel(self)
-        nivel = self.niveles[self.nivel]
-        self.gestor_nivel.cargar(nivel)
-        self.estado = 1
-        self.taskMgr.add(self.actualizar, 'actualizar')
-            
     def salvar_vecino(self, colision):
         self.sonido_item.play()
         vecinos = self.gestor_nivel.vecinos
 
         nombre = colision.getIntoNode().getName()
         self.jugador.actualizar_puntos(vecinos[0].puntos)
+        self.gestor_nivel.gui.actualizar_objetivo()
         for vecino in vecinos:
             if vecino.nombre == nombre:
                 vecino.eliminar()
@@ -149,7 +170,13 @@ class Juego(ShowBase):
             self.menu_opciones.esconder_menu()
             self.estado = 2
             
-        
+    def aparcer(self, objeto, tiempo):
+        LerpColorScaleInterval(objeto, tiempo, (1, 1, 1, 1), startColorScale=(1, 1, 1, 0)).start()
+
+    def inicio(self,_):
+        self.menu_principal.mostrar_menu()
+        self.aparcer(self.menu_principal.menu, 3)
+
     def menu(self):
         self.estado = 0
         self.menu_opciones.esconder_menu()
@@ -176,6 +203,7 @@ class Juego(ShowBase):
     def musica(self):
         volumen = self.menu_opciones.volumen['value'] / 1000
         self.musica_menu.setVolume(volumen)
+        self.musica_volumen = volumen
 
     def salir(self):
         self.userExit()

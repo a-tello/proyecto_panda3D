@@ -6,6 +6,9 @@ class Menu():
     def __init__(self, juego):
         self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
         self.menu = DirectFrame(frameColor = (1, 1, 1, 0))
+        
+        self.aspect = juego.getAspectRatio()
+        self.color = (11/255.0, 96/255.0, 13/255.0, 1)
         self.sonido_boton = juego.loader.loadSfx('assets/sounds/boton.ogg')
         self.sonido_boton.setVolume(0.5)
         self.fuente = juego.loader.loadFont('assets/fonts/FEASFBI_.TTF')
@@ -23,71 +26,58 @@ class Menu():
 class MenuPrincipal(Menu):
     def __init__(self, juego):
         super().__init__(juego)
-        
-        color = (11/255.0, 96/255.0, 13/255.0, 1)
-
-        title = DirectLabel(text = 'Zombies', scale = 0.2, pos = (0, 0, 0.8), parent = self.menu, frameColor=(0,0,0,0),
-                        text_fg = color, text_font = self.fuente)
-        title = DirectLabel(text = 'Ate My', scale = 0.2, pos = (0, 0, 0.6), parent = self.menu, frameColor=(0,0,0,0),
-                        text_fg = color, text_font = self.fuente)
-        title = DirectLabel(text = 'Neighbors 3D', scale = 0.2, pos = (0, 0, 0.4), parent = self.menu, frameColor=(0,0,0,0),
-                        text_fg = color, text_font = self.fuente)
-        
-        btn = DirectButton(text = 'Jugar', command = juego.jugar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1, frameColor=(1,0,0,1),
+                
+        btn = DirectButton(text = 'Jugar', command = juego.jugar, pos = (self.aspect-0.5, 0, 0), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
                         frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
 
-        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (0, 0, -0.2), parent = self.menu, scale = 0.1, 
+        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (self.aspect-0.5, 0, -0.3), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
                         frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
 
-        btn = DirectButton(text = 'Salir', command = juego.salir, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, frameColor=(1,0,0,1),
+        btn = DirectButton(text = 'Salir', command = juego.salir, pos = (self.aspect-0.5, 0, -0.6), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
-                        frameTexture = self.boton_imagenes, text_fg = color)
+                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
 
 
 class MenuOpciones(Menu):
     def __init__(self, juego):
-        super().__init__(juego)
-        
+        super().__init__(juego)      
 
-        title = DirectLabel(text = 'Opciones', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
-                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
-        
-
-        DirectLabel(text = 'Resolución', scale = 0.1, pos = (-.5, 0, 0.6), parent = self.menu, text_fg = (1, 1, 1, 1), 
+        DirectLabel(text = 'Resolución', scale = 0.1, pos = (-.5, 0, 0.6), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
                     frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
 
         btn = DirectOptionMenu(text='Resolución de pantalla', pos = (.5, 0, 0.6), parent = self.menu, scale=0.1, initialitem=0,
                         frameSize = (-4, 4, -1, 1), text_scale = 1.1, text_pos = (0, -0.2), command=juego.cambiar_pantalla, text_align=TextNode.ACenter,
-                        items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1, clickSound = self.sonido_boton)
+                        items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1, clickSound = self.sonido_boton,
+                        frameTexture = self.boton_imagenes)
         btn.setTransparency(True)
 
 
-        DirectLabel(text = 'Modo de pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu, text_fg = (1, 1, 1, 1), 
+        DirectLabel(text = 'Modo de pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
                     frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
         
         botones = [
         DirectRadioButton(text='Pantalla Completa', variable=[1], value=[0], indicatorValue=False ,scale=0.08, pos=(0.5, 0, .23), command=juego.modo_pantalla, 
-                          parent=self.menu, extraArgs=[True], clickSound = self.sonido_boton, text_font = self.fuente),
+                          parent=self.menu, extraArgs=[True], clickSound = self.sonido_boton, text_font = self.fuente,frameTexture = self.boton_imagenes),
         DirectRadioButton(text='Modo ventana', variable=[1], value=[1], indicatorValue=False, scale=0.08, pos=(0.43, 0, .10), command=juego.modo_pantalla, 
-                          parent=self.menu, extraArgs=[False], clickSound = self.sonido_boton, text_font = self.fuente)
+                          parent=self.menu, extraArgs=[False], clickSound = self.sonido_boton, text_font = self.fuente,frameTexture = self.boton_imagenes)
         ]
 
         for boton in botones:
             boton.setOthers(botones)
 
         
-        DirectLabel(text = 'Musica', scale = 0.1, pos = (-.5, 0, -0.2), parent = self.menu, 
+        DirectLabel(text = 'Musica', scale = 0.1, pos = (-.5, 0, -0.2), parent = self.menu, frameColor=(0,0,0,0),
                         text_fg = (1, 1, 1, 1),frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
-        self.volumen = DirectSlider(range=(0,100), value=100, pos = (.5, 0, -0.2), pageSize=3, command=juego.musica, scale=0.5, parent=self.menu)
+        self.volumen = DirectSlider(range=(0,100), value=0, pos = (.5, 0, -0.2), pageSize=3, command=juego.musica, scale=0.5, parent=self.menu, frameTexture = self.boton_imagenes)
 
 
-        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton, text_font = self.fuente)
+        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, text_fg = (1, 1, 1, 1),
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton, text_font = self.fuente, frameTexture = self.boton_imagenes)
         btn.setTransparency(True)
 
 
@@ -95,7 +85,6 @@ class MenuPausa(Menu):
     def __init__(self, juego):
         super().__init__(juego)
         
-        #self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
 
         title = DirectLabel(text = 'Pausa', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
                         relief = None,  text_fg = (1, 1, 1, 1))
@@ -117,9 +106,6 @@ class PantallaFinal(Menu):
     def __init__(self, juego, puntos):
         super().__init__(juego)
         
-        #self.menu_fondo = DirectDialog(frameColor = (0, 0, 0, 255), frameSize = (-1, 1, -1, 1), parent = juego.render2d, fadeScreen = 0.4)
-        #self.menu = DirectDialog(frameColor = (0, 0, 0, 0), fadeScreen = 0.4)
-
         title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
                         relief = None,  text_fg = (1, 1, 1, 1))
         

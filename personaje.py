@@ -28,7 +28,8 @@ class Personaje():
 
         # ATRIBUTOS
         self.vida = 10
-        self.velocidad = 10
+        self.vida_max = 10
+        self.velocidad = 20
         self.ataque = 3
 
         # TECLAS
@@ -85,27 +86,27 @@ class Personaje():
         self.juego.cTrav.addCollider(self.colisionador_obj, self.juego.cHandler)
         
         # PUNTAJE
-        self.puntaje_pantalla = OnscreenText(text = '0', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
+        #self.puntaje_pantalla = OnscreenText(text = '0', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
 
         self.cooldown = 0
         
 
 
-        self.iconos_vida_true = []
-        self.iconos_vida_false = []
-        for i in range(self.vida):
-            vida_img_true = OnscreenImage(image = 'assets/objects/vida_completa.png',
-                                pos = (-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
+        # self.iconos_vida_true = []
+        # self.iconos_vida_false = []
+        # for i in range(self.vida):
+        #     vida_img_true = OnscreenImage(image = 'assets/objects/vida_completa.png',
+        #                         pos = (-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
                                 
-            vida_img_false = OnscreenImage(image = 'assets/objects/vida_vacia.png',
-                                pos=(-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
+        #     vida_img_false = OnscreenImage(image = 'assets/objects/vida_vacia.png',
+        #                         pos=(-1.25 + i * .06, 0, .9), scale=(.04,1,.07))
             
-            vida_img_true.setTransparency(True)
-            vida_img_false.setTransparency(True)
-            vida_img_true.hide()
-            vida_img_false.hide()
-            self.iconos_vida_true.append(vida_img_true)
-            self.iconos_vida_false.append(vida_img_false)
+        #     vida_img_true.setTransparency(True)
+        #     vida_img_false.setTransparency(True)
+        #     vida_img_true.hide()
+        #     vida_img_false.hide()
+        #     self.iconos_vida_true.append(vida_img_true)
+        #     self.iconos_vida_false.append(vida_img_false)
                 
         self.sonido_disparo = juego.loader.loadSfx("assets/sounds/disparo.ogg")
         self.sonido_disparo.setVolume(.02)
@@ -115,15 +116,11 @@ class Personaje():
 
     def actualizar_vida(self, danio):
         self.vida += danio
-        for i, icono in enumerate(self.iconos_vida_true):
-            if i < self.vida:
-                icono.show()
-            else:
-                self.iconos_vida_false[i].show()
+        self.juego.gestor_nivel.gui.actualizar_vida(self.vida)
 
     def actualizar_puntos(self, puntos):
         self.puntaje += puntos
-        self.puntaje_pantalla.setText(str(self.puntaje))
+        self.juego.gestor_nivel.gui.actualizar_puntos(self.puntaje)
 
     def mover(self, dt):
         self.actualizar_vida(0)
@@ -213,7 +210,7 @@ class Personaje():
             # self.juego.cTrav.addCollider(bala_nodo, self.juego.cHandler)
 
             # self.balas_activas.append({'modelo': bala, 'velocidad': 40})
-            self.cooldown = 1
+            self.cooldown = .2
         
         self.juego.gestor_nivel.actualizar_balas(dt)
         # for bala in self.juego.gestor_nivel.balas_activas[:]:
