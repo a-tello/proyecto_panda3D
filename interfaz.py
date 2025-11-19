@@ -15,6 +15,8 @@ class Interfaz():
         self.vecinos_salvados = 0
         self.iconos_vida_true = []
         self.iconos_vida_false = []
+        self.municion_maxima = juego.jugador.municion_maxima
+        self.cargador = juego.jugador.cargador
 
     def crear_GUI(self):
         self.cargar_iconos_vida()
@@ -26,6 +28,9 @@ class Interfaz():
         self.objetivo_img_inactivo.setTransparency(True)
         self.objetivo_img_activo.hide()
         self.mira = OnscreenText(text = '+', pos = (0,0,0), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft)
+        self.balas_gui = OnscreenText(text = f'{self.municion_maxima}/{self.cargador}', pos = (-1.05, -0.8), mayChange = True, scale=0.1, fg=(255,255,255,255))
+        self.balas_img = OnscreenImage(image = 'assets/GUI/Bullet.png', pos = (-1.25, 0, -0.78), scale = (.03, .05, .05))
+        self.balas_img.setTransparency(True)
 
     def actualizar_vida(self, vida):
         self.vida = vida
@@ -45,6 +50,9 @@ class Interfaz():
         if self.vecinos_salvados == self.vecinos_total:
             self.objetivo_img_inactivo.hide()
             self.objetivo_img_activo.show()
+    
+    def actualizar_balas(self, balas, cargador):
+        self.balas_gui.setText(str(f'{balas}/{cargador}'))
 
     def cargar_iconos_vida(self):
         for i in range(self.vida):
@@ -62,7 +70,7 @@ class Interfaz():
             self.iconos_vida_false.append(vida_img_false)
     
     def inicializar(self):
-        self.objetivo_img_inactivo.hide()
+        self.objetivo_img_inactivo.show()
         self.objetivo_img_activo.hide()
         self.vida = self.juego.jugador.vida_max
         self.actualizar_vida(10)
