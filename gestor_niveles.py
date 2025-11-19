@@ -21,7 +21,7 @@ class Nivel():
         self.enemigos_spawn = []
         self.enemigos_muertos = []
         self.enemigos_id = 0
-        self.enemigos_max = juego.niveles[juego.nivel]['enemigos']
+        self.enemigos_max = 0
         self.intervalo_spawn = 2
         self.temporizador_spawn = 2
         
@@ -44,7 +44,8 @@ class Nivel():
         
         if self.juego.jugador is None:
             self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
-        print(info_nivel['enemigos'])
+
+        self.enemigos_max = self.juego.niveles[self.juego.nivel]['enemigos']
         self.spawnear_enemigos(info_nivel['enemigos'])
         self.spawnear_vecinos(info_nivel['vecinos'])
         
