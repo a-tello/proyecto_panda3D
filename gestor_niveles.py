@@ -145,10 +145,11 @@ class Nivel():
         self.sonido_final_nivel.play()
         self.limpiar_nivel()
         self.juego.nivel += 1
-        self.gui.inicializar()
         self.juego.jugador.vida = self.juego.jugador.vida_max
         self.juego.jugador.municion = self.juego.jugador.municion_maxima
         self.juego.jugador.cargador = 90
+        self.gui.inicializar()
+        self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
         self.cargar(self.juego.niveles[self.juego.nivel])
         self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
 
@@ -157,3 +158,16 @@ class Nivel():
     def crear_final(self):
         self.puerta_final = Puerta(self.juego)
         self.juego.accept(f'personaje_obj-into-puerta', self.pasar_nivel)
+        
+    def reiniciar(self):
+        self.juego.taskMgr.remove('actualizar')
+        self.musica_nivel.stop()
+        self.limpiar_nivel()
+        self.juego.nivel = 0
+        self.gui.inicializar()
+        self.juego.jugador.vida = self.juego.jugador.vida_max
+        self.juego.jugador.municion = self.juego.jugador.municion_maxima
+        self.juego.jugador.cargador = 90
+        self.juego.jugador.puntaje = 0
+        self.cargar(self.juego.niveles[self.juego.nivel])
+        self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')

@@ -29,7 +29,7 @@ class Personaje():
         # ATRIBUTOS
         self.vida = 10
         self.vida_max = 10
-        self.velocidad = 20
+        self.velocidad = 5
         self.ataque = 3
 
         # TECLAS

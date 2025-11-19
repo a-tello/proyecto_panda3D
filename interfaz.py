@@ -77,3 +77,37 @@ class Interfaz():
         self.vecinos_salvados = 0
         self.vecinos_total = self.juego.niveles[self.juego.nivel]['vecinos']
         self.objetivo_gui.setText(str(f'{self.vecinos_salvados}/{self.vecinos_total}'))
+        
+    def esconder(self):
+        #self.cargar_iconos_vida()
+        self.puntos_gui.hide()
+        self.objetivo_gui.hide()
+        self.mira.hide() 
+        self.balas_gui.hide()
+        self.balas_img.hide()
+        
+        if not self.objetivo_img_activo.isHidden():
+            self.objetivo_img_activo.hide()
+        if not self.objetivo_img_inactivo.isHidden():
+            self.objetivo_img_inactivo.hide()
+            
+        for i, icono in enumerate(self.iconos_vida_true):
+                icono.hide()
+                self.iconos_vida_false[i].hide()
+        
+    def mostrar(self):
+        self.puntos_gui.show()
+        self.objetivo_gui.show()
+        self.mira.show() 
+        self.balas_gui.show()
+        self.balas_img.show()
+        
+        if self.vecinos_salvados == self.vecinos_total:
+            self.objetivo_img_activo.show()
+        else:
+            self.objetivo_img_inactivo.show()
+        
+
+        
+        
+        

@@ -7,7 +7,7 @@ from panda3d.core import TransparencyAttrib
 from direct.interval.LerpInterval import LerpColorScaleInterval
 from objetos import Puerta
 from direct.showbase.ShowBase import ShowBase
-
+from constantes import ESTADO
 from panda3d.core import CollisionTraverser, CollisionHandlerPusher,CollisionHandlerEvent, CollisionNode, CollisionBox
 
 
@@ -76,7 +76,7 @@ class Juego(ShowBase):
                         {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg'},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg'}]
         
-        self.estado = 0
+        self.estado = ESTADO['MENU']
         self.jugador = None
         self.gestor_nivel = None
         self.accept('escape', self.pausa)
@@ -93,10 +93,7 @@ class Juego(ShowBase):
         # TODO
         if self.jugador.vida < 1:
             self.taskMgr.remove('actualizar')
-            self.gestor_nivel.limpiar_nivel()
-            self.jugador.personaje.removeNode()
             self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
-            self.jugador = None
             self.pantalla.setCursorHidden(False)
             self.win.requestProperties(self.pantalla)
 
@@ -104,19 +101,20 @@ class Juego(ShowBase):
             
 
     def jugar(self):
+        if self.estado == ESTADO['MENU']:
         #self.fondo.hide()
-        self.menu_principal.esconder_menu()
-        self.pantalla.setCursorHidden(True)
-        self.win.requestProperties(self.pantalla)
+            self.menu_principal.esconder_menu()
+            self.pantalla.setCursorHidden(True)
+            self.win.requestProperties(self.pantalla)
         # if self.pantalla_final is not None:
         #     self.pantalla_final.esconder_menu()
-        self.musica_menu.stop()
+            self.musica_menu.stop()
 
-        self.gestor_nivel = Nivel(self)
-        nivel = self.niveles[self.nivel]
-        self.gestor_nivel.cargar(nivel)
-        self.estado = 1
-        self.taskMgr.add(self.actualizar, 'actualizar')
+            self.gestor_nivel = Nivel(self)
+            nivel = self.niveles[self.nivel]
+            self.gestor_nivel.cargar(nivel)
+            self.estado = ESTADO['JUGANDO']
+            self.taskMgr.add(self.actualizar, 'actualizar')
 
 
     def impacto(self, colision):
@@ -153,23 +151,32 @@ class Juego(ShowBase):
             self.gestor_nivel.crear_final()
 
     def pausa(self):
-        if self.estado == 1:
+        if self.estado == ESTADO['JUGANDO']:
+            self.gestor_nivel.gui.esconder()
             self.pantalla.setCursorHidden(False)
             self.win.requestProperties(self.pantalla)
             self.taskMgr.remove('actualizar')
             self.menu_pausa.mostrar_menu()
-            self.estado = 2
-        elif self.estado == 2:
+            self.estado = ESTADO['PAUSA']
+            
+        elif self.estado == ESTADO['PAUSA']:
             self.pantalla.setCursorHidden(True)
             self.win.requestProperties(self.pantalla)
+            self.gestor_nivel.gui.mostrar()
             self.taskMgr.add(self.actualizar, 'actualizar')
             self.menu_pausa.esconder_menu()
-            self.estado = 1
-        elif self.estado == 3:
-            self.menu_pausa.mostrar_menu()
-            self.menu_opciones.esconder_menu()
-            self.estado = 2
+            self.estado = ESTADO['JUGANDO']
             
+        # elif self.estado == ESTADO['PAUSA_OPC']:
+        #     self.ignore('escape')       
+
+    def volver(self):
+        if self.estado == ESTADO['PAUSA']:
+            self.menu_opciones.esconder_menu()
+            self.menu_pausa.mostrar_menu()
+        else:
+            self.menu()
+    
     def aparcer(self, objeto, tiempo):
         LerpColorScaleInterval(objeto, tiempo, (1, 1, 1, 1), startColorScale=(1, 1, 1, 0)).start()
 
@@ -178,7 +185,7 @@ class Juego(ShowBase):
         self.aparcer(self.menu_principal.menu, 3)
 
     def menu(self):
-        self.estado = 0
+        self.estado = ESTADO['MENU']
         self.menu_opciones.esconder_menu()
         self.menu_pausa.esconder_menu()
         if self.pantalla_final is not None:
@@ -186,7 +193,9 @@ class Juego(ShowBase):
         self.menu_principal.mostrar_menu()
         
     def opciones(self):
-        self.estado = 3
+        if self.estado == ESTADO['PAUSA']:
+            self.ignore('escape')
+        
         self.menu_principal.esconder_menu()
         self.menu_pausa.esconder_menu()
         self.menu_opciones.mostrar_menu()

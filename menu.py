@@ -76,7 +76,7 @@ class MenuOpciones(Menu):
         self.volumen = DirectSlider(range=(0,100), value=0, pos = (.5, 0, -0.2), pageSize=3, command=juego.musica, scale=0.5, parent=self.menu, frameTexture = self.boton_imagenes)
 
 
-        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, text_fg = (1, 1, 1, 1),
+        btn = DirectButton(text = 'Volver', command = juego.volver, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, text_fg = (1, 1, 1, 1),
                         frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton, text_font = self.fuente, frameTexture = self.boton_imagenes)
         btn.setTransparency(True)
 
@@ -109,7 +109,7 @@ class PantallaFinal(Menu):
         title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
                         relief = None,  text_fg = (1, 1, 1, 1))
         
-        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (-1.28, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft,parent = self.menu)
+        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (0, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft,parent = self.menu)
 
 
         btn = DirectButton(text = 'Reiniciar', command = juego.jugar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
