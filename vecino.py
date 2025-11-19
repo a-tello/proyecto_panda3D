@@ -10,12 +10,14 @@ from direct.gui.OnscreenImage import OnscreenImage
 
 class Vecino():
     def __init__(self, juego, tipo, pos, nombre):
-        self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/boss.glb', '3':'assets/models/boss.glb', '4':'assets/models/boss.glb', '5':'assets/models/boss.glb'}
+        #self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/boss.glb', '3':'assets/models/boss.glb', '4':'assets/models/boss.glb', '5':'assets/models/boss.glb'}
+        self.modelos = {'1':'boss.glb', '2':'peasant.glb', '3':'AJ.glb', '4':'Amy.glb', '5':'Kaya.glb'}
         self.vecino = Actor(self.modelos[tipo], {'idle': self.modelos[tipo], 'action': self.modelos[tipo]})
         self.vecino.setPos(pos)
         self.vecino.reparentTo(juego.render)
         self.nombre = nombre
         self.vecino.loop('idle')
+        self.vecino.get_parent().lookAt(juego.jugador.personaje)
         
         
         # COLISION
@@ -29,7 +31,6 @@ class Vecino():
         self.puntos = 1000
 
     def actualizar(self):
-        self.vecino.lookAt(self.juego.jugador.personaje.getPos())
         animacion_especial = self.vecino.getAnimControl('action')
         if not animacion_especial and not animacion_especial.isPlaying():
             self.vecino.loop('idle')
@@ -38,7 +39,7 @@ class Vecino():
         self.vecino.cleanup()
         self.vecino.removeNode()
 
-    def accion(self):
-        if random.random() < 0.01:  
-            self.vecino.stop('idle')
-            self.vecino.play('action')
+    # def accion(self):
+    #     if random.random() < 0.01:  
+    #         self.vecino.stop('idle')
+    #         self.vecino.play('action')
