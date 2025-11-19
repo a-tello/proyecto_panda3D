@@ -69,7 +69,7 @@ class Juego(ShowBase):
         self.cTrav.setRespectPrevTransform(True)
 
         # CAMARA
-        self.disableMouse()
+        #self.disableMouse()
 
         self.nivel = 0
         self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 2, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg'},
@@ -90,19 +90,23 @@ class Juego(ShowBase):
         self.gestor_nivel.actualizar_enemigos(dt)
         self.cTrav.traverse(self.render)
 
-        # TODO
         if self.jugador.vida < 1:
-            self.taskMgr.remove('actualizar')
-            self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
-            self.pantalla.setCursorHidden(False)
-            self.win.requestProperties(self.pantalla)
+            self.terminar_partida()
+        #     self.taskMgr.remove('actualizar')
+        #     self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+        #     self.pantalla.setCursorHidden(False)
+        #     self.win.requestProperties(self.pantalla)
 
         return task.cont
             
 
     def jugar(self):
-        if self.estado == ESTADO['MENU']:
-        #self.fondo.hide()
+        if self.jugador is not None:
+            self.terminar_partida()
+            self.reiniciar()
+        else:
+            #if self.estado == ESTADO['MENU']:
+            #self.fondo.hide()
             self.menu_principal.esconder_menu()
             self.pantalla.setCursorHidden(True)
             self.win.requestProperties(self.pantalla)
@@ -115,7 +119,6 @@ class Juego(ShowBase):
             self.gestor_nivel.cargar(nivel)
             self.estado = ESTADO['JUGANDO']
             self.taskMgr.add(self.actualizar, 'actualizar')
-
 
     def impacto(self, colision):
         # enemigos = self.gestor_nivel.enemigos
@@ -174,6 +177,7 @@ class Juego(ShowBase):
         if self.estado == ESTADO['PAUSA']:
             self.menu_opciones.esconder_menu()
             self.menu_pausa.mostrar_menu()
+            self.accept('escape', self.pausa)
         else:
             self.menu()
     
@@ -214,9 +218,32 @@ class Juego(ShowBase):
         self.musica_menu.setVolume(volumen)
         self.musica_volumen = volumen
 
+    def reiniciar(self):
+        if self.pantalla_final is not None:
+            self.pantalla_final.esconder_menu()
+        self.jugar()
+
+    def terminar_partida(self):
+        self.taskMgr.remove('actualizar')
+        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+        self.pantalla.setCursorHidden(False)
+        self.win.requestProperties(self.pantalla)
+        self.jugador.eliminar()
+        self.jugador = None
+        self.gestor_nivel.limpiar_nivel()
+        self.gestor_nivel.gui.menu.removeNode()
+        self.gestor_nivel = None
+        self.nivel = 0
+
     def salir(self):
         self.userExit()
 
 
 juego = Juego()
 juego.run()
+
+# Obtener los nodos hijos de render
+# nodos_hijos = render.get_children()
+
+# for nodo in nodos_hijos:
+#     print(nodo)

@@ -90,6 +90,7 @@ class Enemigo():
     
 
     def morir(self):
+        self.sonido_zombie.stop()
         self.zombie.stop()
         morir = LerpColorScaleInterval(self.zombie, 2.0, VBase4(1, 1, 1, 0))
         morir.start()

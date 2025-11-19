@@ -57,25 +57,27 @@ class Nivel():
 
     def cargar_mapa(self, img_mapa):
         # ENTORNO
-        skybox = self.juego.loader.loadModel("models/misc/sphere")
-        skybox.reparentTo(self.juego.render)
-        skybox.setScale(500)
-        skybox.setTwoSided(True)
+        self.skybox = self.juego.loader.loadModel("models/misc/sphere")
+        self.skybox.reparentTo(self.juego.render)
+        self.skybox.setScale(500)
+        self.skybox.setTwoSided(True)
         textura = self.juego.loader.loadTexture("assets/Environment/cielo2.jpg")
-        skybox.setTexture(textura)
-        skybox.setPos(-10, -10, 0)
+        self.skybox.setTexture(textura)
+        self.skybox.setPos(-10, -10, 0)
 
         self.mapa = MapaImagen(self.juego, img_mapa, self)
         
         #ILUMINACION
         ambient = AmbientLight('ambient_light')
         ambient.setColor((0.5, 0.5, 0.5, 1))
-        self.juego.render.setLight(self.juego.render.attachNewNode(ambient))
+        self.luz_ambiente = self.juego.render.attachNewNode(ambient)
+        self.juego.render.setLight(self.luz_ambiente)
 
         dlight = DirectionalLight('directional_light')
         dlight.setColor((1, 1, 1, 1))
         dlight.setDirection(Point3(1, -1, -1))
-        self.juego.render.setLight(self.juego.render.attachNewNode(dlight))
+        self.luz_direccional = self.juego.render.attachNewNode(dlight)
+        self.juego.render.setLight(self.luz_direccional)
 
     def spawnear_enemigos(self, cantidad):
         if len(self.enemigos) < cantidad:
@@ -128,9 +130,10 @@ class Nivel():
                 self.balas_activas.remove(bala)
 
     def limpiar_nivel(self):
-        for vecino in self.vecinos:
+        for vecino in self.vecinos[:]:
             vecino.eliminar()
-        for zombie in self.enemigos:
+            self.vecinos.remove(vecino)
+        for zombie in self.enemigos[:]:
             zombie.eliminar()
             self.enemigos.remove(zombie)
 
@@ -138,6 +141,10 @@ class Nivel():
         self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []
         if self.puerta_final:
             self.puerta_final.puerta.removeNode()
+        
+        self.luz_ambiente.removeNode()
+        self.luz_direccional.removeNode()
+        self.skybox.removeNode()
 
     def pasar_nivel(self, _):
         self.juego.taskMgr.remove('actualizar')
@@ -151,6 +158,8 @@ class Nivel():
         self.gui.inicializar()
         self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
         self.cargar(self.juego.niveles[self.juego.nivel])
+        print(self.gui)
+        #self.gui.mostrar()
         self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
 
         # self.juego.jugar()
@@ -159,15 +168,16 @@ class Nivel():
         self.puerta_final = Puerta(self.juego)
         self.juego.accept(f'personaje_obj-into-puerta', self.pasar_nivel)
         
-    def reiniciar(self):
-        self.juego.taskMgr.remove('actualizar')
-        self.musica_nivel.stop()
-        self.limpiar_nivel()
-        self.juego.nivel = 0
-        self.gui.inicializar()
-        self.juego.jugador.vida = self.juego.jugador.vida_max
-        self.juego.jugador.municion = self.juego.jugador.municion_maxima
-        self.juego.jugador.cargador = 90
-        self.juego.jugador.puntaje = 0
-        self.cargar(self.juego.niveles[self.juego.nivel])
-        self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
+    # def reiniciar(self):
+        
+    #     self.juego.taskMgr.remove('actualizar')
+    #     self.musica_nivel.stop()
+    #     self.limpiar_nivel()
+    #     self.juego.nivel = 0
+    #     self.gui.inicializar()
+    #     self.juego.jugador.vida = self.juego.jugador.vida_max
+    #     self.juego.jugador.municion = self.juego.jugador.municion_maxima
+    #     self.juego.jugador.cargador = 90
+    #     self.juego.jugador.puntaje = 0
+    #     self.cargar(self.juego.niveles[self.juego.nivel])
+    #     self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')

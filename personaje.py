@@ -27,9 +27,9 @@ class Personaje():
         self.personaje.loop('stand')
 
         # ATRIBUTOS
-        self.vida = 10
-        self.vida_max = 10
-        self.velocidad = 5
+        self.vida = 1
+        self.vida_max = 1
+        self.velocidad = 20
         self.ataque = 3
 
         # TECLAS
@@ -106,7 +106,6 @@ class Personaje():
         self.juego.gestor_nivel.gui.actualizar_puntos(self.puntaje)
 
     def mover(self, dt):
-        self.actualizar_vida(0)
         # MOVIMIENTO CAMARA
         if self.juego.mouseWatcherNode.hasMouse():
             x = self.juego.win.getPointer(0).getX()
@@ -182,9 +181,6 @@ class Personaje():
         if self.cooldown > 0:
             self.cooldown -= dt
                         
-        
-        
-        
     def movimiento_camara(self):
         personaje_pos = self.personaje.getPos()
         self.juego.camera.setPos(personaje_pos + Vec3(0, 0, 1.2))
@@ -211,7 +207,9 @@ class Personaje():
                 self.municion -= 1
             self.juego.gestor_nivel.gui.actualizar_balas(self.municion, self.cargador)
             
-            
+    def eliminar(self):
+        self.personaje.cleanup()
+        self.personaje.removeNode()
             
         
         

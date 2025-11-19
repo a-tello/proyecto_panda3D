@@ -20,11 +20,8 @@ class Interfaz():
 
     def actualizar_vida(self, vida):
         self.vida = vida
-        print(len(self.iconos_vida_true))
         for i, icono in enumerate(self.iconos_vida_true):
-            print(i)
             if i < self.vida:
-                print('mostar')
                 icono.show()
                 self.iconos_vida_false[i].hide()
             else:
