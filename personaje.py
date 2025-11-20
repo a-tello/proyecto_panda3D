@@ -30,7 +30,7 @@ class Personaje():
         self.personaje.loop('idle')
 
         # ATRIBUTOS
-        self.vida = 1
+        self.vida = 10
         self.vida_max = 10
         self.velocidad = 5
         self.ataque = 3

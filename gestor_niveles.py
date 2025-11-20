@@ -53,6 +53,7 @@ class Nivel():
         if self.gui is None:
             self.gui = Interfaz(self.juego)
             self.gui.crear_GUI()
+            self.gui.esconder()
         
             
 
@@ -186,19 +187,22 @@ class Nivel():
         self.skybox.removeNode()
 
     def pasar_nivel(self, _):
-        self.juego.taskMgr.remove('actualizar')
-        self.musica_nivel.stop()
-        self.sonido_final_nivel.play()
-        self.juego.cargar_pantalla_de_carga()
-        self.limpiar_nivel()
         self.juego.nivel += 1
-        self.juego.jugador.vida = self.juego.jugador.vida_max
-        self.juego.jugador.municion = self.juego.jugador.municion_maxima
-        self.juego.jugador.cargador = 90
-        self.gui.inicializar()
-        self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
-        self.cargar(self.juego.niveles[self.juego.nivel])
-        self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
+        if self.juego.nivel + 1  > len(self.juego.niveles):
+            self.juego.terminar_partida('GANASTE. Salvaste a todo el barrio')
+        else:
+            self.juego.taskMgr.remove('actualizar')
+            self.musica_nivel.stop()
+            self.sonido_final_nivel.play()
+            self.juego.cargar_pantalla_de_carga()
+            self.limpiar_nivel()
+            self.juego.jugador.vida = self.juego.jugador.vida_max
+            self.juego.jugador.municion = self.juego.jugador.municion_maxima
+            self.juego.jugador.cargador = 90
+            self.gui.inicializar()
+            self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
+            self.cargar(self.juego.niveles[self.juego.nivel])
+            self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
 
     def mutear_zombies(self):
         for zombie in self.enemigos:

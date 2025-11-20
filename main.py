@@ -79,11 +79,17 @@ class Juego(ShowBase):
         #self.disableMouse()
 
         self.nivel = 0
+        # self.niveles = [
+        #     #{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 5},
+        #     {'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 2, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 3},
+        #                 {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 5},
+        #                 {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg', 'powerups': 7}]
+        
         self.niveles = [
             #{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 5},
-            {'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 2, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 3},
-                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 5},
-                        {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg', 'powerups': 7}]
+            {'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 3},
+                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 0, 'vecinos': 2,'mapa': 'test.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 1},
+                        {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl3_music.ogg', 'powerups': 1}]
         
         self.estado = ESTADO['MENU']
         self.jugador = None
@@ -109,8 +115,8 @@ class Juego(ShowBase):
             
 
     def jugar(self):
-        if self.jugador is not None:
-            self.terminar_partida()
+        # if self.jugador is not None:
+        #     self.terminar_partida('A')
         if self.pantalla_final is not None:
             self.pantalla_final.esconder_menu()
         #if self.estado == ESTADO['MENU']:
@@ -122,11 +128,11 @@ class Juego(ShowBase):
     #     self.pantalla_final.esconder_menu()
         self.musica_menu.stop()
 
-        self.cargar_pantalla_de_carga()
         self.gestor_nivel = Nivel(self)
         nivel = self.niveles[self.nivel]
         self.gestor_nivel.cargar(nivel)
         self.estado = ESTADO['JUGANDO']
+        self.cargar_pantalla_de_carga()
         self.taskMgr.add(self.actualizar, 'actualizar')
 
     def impacto(self, colision):
@@ -243,10 +249,10 @@ class Juego(ShowBase):
             self.pantalla_final.esconder_menu()
         #self.jugar()
 
-    def terminar_partida(self):
+    def terminar_partida(self, texto):
         self.taskMgr.remove('restaurar-velocidad')
         self.taskMgr.remove('actualizar')
-        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje, 'PERDISTE')
+        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje, texto)
         self.pantalla.setCursorHidden(False)
         self.win.requestProperties(self.pantalla)
         self.jugador.eliminar()
@@ -289,6 +295,7 @@ class Juego(ShowBase):
         self.pantalla_carga.destroy()
         self.menu_fondo.destroy()
         self.mensaje.removeNode()
+        self.gestor_nivel.gui.mostrar()
 
         #self.task_mgr.add(self.actualizar, 'actualizar')
         
@@ -301,7 +308,7 @@ class Juego(ShowBase):
             with open(nombre_archivo, 'r') as archivo:
                 jugadores = json.load(archivo)
                 if jugadores:
-                    puntajes = sorted(jugadores, key=lambda x: x['puntos'], reverse=True)[:10]
+                    puntajes = sorted(jugadores, key=lambda x: x['puntos'], reverse=True)[:7]
                 else: 
                     puntajes = []
                     
