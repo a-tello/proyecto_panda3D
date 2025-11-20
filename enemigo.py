@@ -46,7 +46,6 @@ class Enemigo():
         
         # COLISION
         zombie_cn = CollisionNode(nombre)
-        #zombie_cn.addSolid(CollisionSphere(0, 0, 1, 1))
         zombie_cn.addSolid(CollisionBox(Point3(0, 0, 1), .3, .3, 1))
         self.colisionador = self.zombie.attachNewNode(zombie_cn)
         self.colisionador.node().setIntoCollideMask(BitMask32.bit(2))
@@ -58,7 +57,6 @@ class Enemigo():
         
         # COLISION (balas)
         zombie_balas_cn = CollisionNode(f'enemigo_balas_{identificador}')
-        #zombie_balas_cn.addSolid(CollisionSphere(0, 0, 0, 1))
         zombie_balas_cn.addSolid(CollisionBox(Point3(0, .2, 1), .3, .3, 1))
         self.colisionador_balas = self.zombie.attachNewNode(zombie_balas_cn)
         zombie_balas_cn.setFromCollideMask(BitMask32.allOff())
@@ -71,7 +69,7 @@ class Enemigo():
         ataque_cn = CollisionNode('ataque')
         ataque_cn.addSolid(self.ataque)
         self.ataque_np = self.zombie.attachNewNode(ataque_cn)
-        #self.ataque_np = juego.render.attachNewNode(ataque_cn)
+
         # MASCARA DE COLISION (para no atacar a otros enemigos)
         ataque_cn.setFromCollideMask(BitMask32().bit(1))
         ataque_cn.setIntoCollideMask(BitMask32().allOff())
@@ -88,7 +86,6 @@ class Enemigo():
         color = LerpColorScaleInterval(self.zombie, 0.3, (1, 1, 1, 1)) 
         color.start()
     
-
     def morir(self):
         self.sonido_zombie.stop()
         self.zombie.stop()
@@ -117,9 +114,6 @@ class Enemigo():
             direccion_objetivo.normalize()
             velocidad = 3
             avance = self.zombie.getPos() + direccion_objetivo * velocidad * dt
-
-            #self.ataque.setPointA(self.zombie.getPos() + Point3(0,0,2))
-            #self.ataque.setPointB(Point3(0,0,2) + direccion_objetivo * self.distancia_ataque)
         
             if distancia < self.distancia_ataque:
                 self.delay_ataque -= dt

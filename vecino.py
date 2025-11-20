@@ -1,16 +1,8 @@
-import math
-import random
-from constantes import *
 from direct.actor.Actor import Actor
-from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionSegment, CollisionHandlerQueue
-from panda3d.core import BitMask32
-from panda3d.core import Point2, Point3, Vec3
-from direct.gui.OnscreenImage import OnscreenImage
+from panda3d.core import CollisionSphere, CollisionNode
 
 class Vecino():
     def __init__(self, juego, tipo, pos, nombre):
-        #self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/boss.glb', '3':'assets/models/boss.glb', '4':'assets/models/boss.glb', '5':'assets/models/boss.glb'}
         self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/peasant.glb', '3':'assets/models/AJ.glb', '4':'assets/models/Amy.glb', '5':'assets/models/Kaya.glb'}
         self.vecino = Actor(self.modelos[tipo], {'idle': self.modelos[tipo], 'action': self.modelos[tipo]})
         self.vecino.setPos(pos)

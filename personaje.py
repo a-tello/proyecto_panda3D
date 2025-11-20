@@ -1,15 +1,10 @@
 import math
-import random
 from objetos import Bala
 from constantes import *
 from direct.actor.Actor import Actor
 from panda3d.core import Vec3
-from panda3d.core import CollisionSphere, CollisionNode, CollisionBox, CollisionHandlerQueue
-from panda3d.core import BitMask32
-from panda3d.core import Point2, Point3, Vec3
-from direct.gui.OnscreenImage import OnscreenImage
-from direct.gui.OnscreenText import OnscreenText
-from panda3d.core import TextNode
+from panda3d.core import CollisionNode, CollisionBox, Point3, Vec3, BitMask32
+
 
 class Personaje():
     def __init__(self, juego, spawn):
@@ -29,7 +24,8 @@ class Personaje():
         self.personaje.setPos(pos.x, pos.y, 0)
         self.personaje.loop('idle')
 
-        self.raygun = juego.loader.loadModel('assets/raygun.glb')
+        # Modelo raygun
+        self.raygun = juego.loader.loadModel('assets/objects/raygun.glb')
         self.raygun.reparentTo(self.personaje)
         x, y, z = juego.gestor_nivel.jugador_spawn
         self.raygun.setPos(0,3,2)
@@ -60,8 +56,6 @@ class Personaje():
 
 
         # CAMARA 
-        # juego.cam.setPos(0, -2, 20)
-        # juego.cam.setP(-90)
         juego.cam.setPos(0, 0, .5)  
         juego.cam.node().getLens().setFov(80)
         self.angulo_horizontal = 0  
@@ -74,7 +68,6 @@ class Personaje():
 
         # COLISION (con paredes y enemigos)
         cn_jugador = CollisionNode('personaje')
-        #cn_jugador.addSolid(CollisionSphere(0, 0, 1, 0.3))
         cn_jugador.addSolid(CollisionBox(Point3(0, 0.2, 2), 0.3, 0.3, 1))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
@@ -88,7 +81,6 @@ class Personaje():
         # COLISION (con NPCs y objetos)
         cn_jugador_obj = CollisionNode('personaje_obj')
         cn_jugador_obj.addSolid(CollisionBox(Point3(0, 0.2, 1.5), 0.4, 0.4, 1))
-        #cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador_obj = self.personaje.attachNewNode(cn_jugador_obj)
         self.colisionador_obj.setPythonTag('owner', self)
         cn_jugador_obj.setFromCollideMask(BitMask32.bit(2))
@@ -98,7 +90,7 @@ class Personaje():
         
         # DISPAROS
         self.cooldown = 0
-        self.municion = 10
+        self.municion = 30
         self.municion_maxima = 30
         self.cargador = 90
                 

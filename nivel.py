@@ -20,7 +20,7 @@ class Mapa():
         
         pared = self.juego.loader.loadModel('models/box')
         pared.setScale(1, 1, 3)
-        textura_pared = self.juego.loader.loadTexture('assets/Environment/tex/pared.jpg')
+        textura_pared = self.juego.loader.loadTexture('assets/Environment/pared.jpg')
         textura_pared.setWrapU(textura_pared.WM_repeat)
         textura_pared.setWrapV(textura_pared.WM_repeat)
         pared.setTexture(textura_pared, 1)
@@ -28,7 +28,7 @@ class Mapa():
         piso = self.juego.loader.loadModel('models/box')
         piso.setScale(ancho, alto, 1)
         piso.setPos(0,0,-1)      
-        textura_piso = self.juego.loader.loadTexture('assets/Environment/tex/tierra.jpg')
+        textura_piso = self.juego.loader.loadTexture('assets/Environment/tierra.jpg')
         textura_piso.setWrapU(textura_piso.WM_repeat)
         textura_piso.setWrapV(textura_piso.WM_repeat)
         piso.setTexture(textura_piso, 1)
@@ -38,8 +38,6 @@ class Mapa():
         
         for y in range(alto):
             for x in range(ancho):
-                #cubo_piso = piso.copyTo(mapa_np)
-                #cubo_piso.setPos(x,y,-1)
                 if matriz[y][x] == 1:
                     cubo_pared = pared.copyTo(mapa_np)
                     self.agregar_colision_pared(cubo_pared)

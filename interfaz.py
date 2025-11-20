@@ -29,10 +29,10 @@ class Interfaz():
     
     def cargar_iconos_vida(self):
         for i in range(self.vida):
-            vida_img_true = OnscreenImage(image = 'assets/objects/vida_completa.png',
+            vida_img_true = OnscreenImage(image = 'assets/GUI/vida_completa.png',
                                 pos = (-1.25 + i * .06, 0, 0.9), scale=(.04,1,.07), parent = self.menu)
                                 
-            vida_img_false = OnscreenImage(image = 'assets/objects/vida_vacia.png',
+            vida_img_false = OnscreenImage(image = 'assets/GUI/vida_vacia.png',
                                 pos=(-1.25 + i * .06, 0, 0.9), scale=(.04,1,.07), parent = self.menu)
             
             vida_img_true.setTransparency(True)
@@ -45,8 +45,8 @@ class Interfaz():
     def crear_GUI(self):
         self.puntos_gui = OnscreenText(text = '0', pos = (-1.25, 0.75), mayChange = True, scale=.1, fg=(255,255,255,255), align=TextNode.ALeft, parent=self.menu)
         self.objetivo_gui = OnscreenText(text = f'0/{self.vecinos_total}', pos = (1.20, 0.8), mayChange = True, scale=0.1, fg=(255,255,255,255), parent=self.menu)
-        self.objetivo_img_activo = OnscreenImage(image = 'assets/GUI/Level/Star/Active.png', pos = (1.05, 0, 0.82), scale = 0.09, parent=self.menu)
-        self.objetivo_img_inactivo = OnscreenImage(image = 'assets/GUI/Level/Star/Unactive.png', pos = (1.05, 0, 0.82), scale = 0.09, parent=self.menu)
+        self.objetivo_img_activo = OnscreenImage(image = 'assets/GUI/Star/Active.png', pos = (1.05, 0, 0.82), scale = 0.09, parent=self.menu)
+        self.objetivo_img_inactivo = OnscreenImage(image = 'assets/GUI/Star/Unactive.png', pos = (1.05, 0, 0.82), scale = 0.09, parent=self.menu)
         self.objetivo_img_activo.setTransparency(True)
         self.objetivo_img_inactivo.setTransparency(True)
         self.objetivo_img_activo.hide()

@@ -1,12 +1,12 @@
-import random
-from panda3d.core import AmbientLight, DirectionalLight
-from nivel import *
-from enemigo import Enemigo
-from panda3d.core import Vec3, Point3
-from vecino import Vecino
-from personaje import Personaje
 from objetos import *
+from nivel import *
+import random
+from personaje import Personaje
 from interfaz import Interfaz
+from enemigo import Enemigo
+from vecino import Vecino
+from panda3d.core import AmbientLight, DirectionalLight, Vec3, Point3
+
 class Nivel():
     def __init__(self, juego):
         self.juego = juego
@@ -35,6 +35,8 @@ class Nivel():
 
 
     def cargar(self, info_nivel):
+        '''Carga todos los objetos del nivel. (Personaje, enemigos, items, musica, GUI)'''
+
         self.musica_nivel = self.juego.loader.loadSfx(info_nivel['musica'])
         self.musica_nivel.setLoop(True)
         self.musica_nivel.setVolume(self.juego.musica_volumen)
@@ -59,6 +61,8 @@ class Nivel():
             
 
     def cargar_mapa(self, img_mapa):
+        '''Genera el mapa desde la clase MapaImagen'''
+
         # ENTORNO
         self.skybox = self.juego.loader.loadModel("models/misc/sphere")
         self.skybox.reparentTo(self.juego.render)
@@ -111,6 +115,8 @@ class Nivel():
             self.juego.accept(f'personaje_obj-into-{nombre}', self.boost)
 
     def boost(self, colision):
+        ''' Gestiona los efectos de los powerups'''
+
         self.juego.sonido_item.play()
         nombre = colision.getIntoNode().getName()
         for powerup in self.items:
@@ -132,7 +138,6 @@ class Nivel():
         
     def restaurar_velocidad(self, _):    
         self.juego.jugador.velocidad = 5
-
 
     def actualizar_enemigos(self, dt):
         self.temporizador_spawn -= dt
@@ -190,6 +195,7 @@ class Nivel():
         self.juego.nivel += 1
         self.musica_nivel.stop()
         self.sonido_final_nivel.play()
+
         if self.juego.nivel + 1  > len(self.juego.niveles):
             self.juego.terminar_partida('GANASTE. Salvaste a todo el barrio')
         else:

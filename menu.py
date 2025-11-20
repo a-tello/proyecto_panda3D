@@ -73,8 +73,6 @@ class MenuOpciones(Menu):
         super().__init__(juego)      
 
         self.crear_etiqueta('Resolución', (-.5, 0, 0.6))
-        # DirectLabel(text = 'Resolución', scale = 0.1, pos = (-.5, 0, 0.6), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
-        #             frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
 
         btn = DirectOptionMenu(text='Resolución de pantalla', pos = (.5, 0, 0.6), parent = self.menu, scale=0.1, initialitem=0,
                                 frameSize = (-4, 4, -1, 1), text_scale = 1.1, text_pos = (0, -0.2), command=juego.cambiar_pantalla, text_align=TextNode.ACenter, items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], 
@@ -82,8 +80,6 @@ class MenuOpciones(Menu):
         btn.setTransparency(True)
 
         self.crear_etiqueta('Modo de pantalla', (-.5, 0, 0.2))
-        # DirectLabel(text = 'Modo de pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
-        #             frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
         
         botones = [
             DirectRadioButton(text='Pantalla Completa', variable=[1], value=[0], indicatorValue=False ,scale=0.08, pos=(0.5, 0, .23), 
