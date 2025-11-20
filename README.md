@@ -15,7 +15,7 @@ En cada nivel encontrarás una cantidad de vecinos a salvar mientras luchas por 
 
 ### Puntuación
 - **+100** puntos por cada zombie derrotado
-- **+500** puntos por cada item recogido
+- **+100** puntos por cada item recogido
 - **+1000** puntos por cada vecino salvado
 
 ### Interfaz de usuario
@@ -32,6 +32,7 @@ En cada nivel encontrarás una cantidad de vecinos a salvar mientras luchas por 
 - **Mouse**: Apuntar
 - **Click izquierdo**: Disparar
 - **ESC**: Pausa/Reanudar
+
 ## Instalación
 
 ### 1) Clonar repositorio
