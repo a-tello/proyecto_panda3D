@@ -36,4 +36,60 @@ class Puerta():
         juego.pusher.addCollider(colisionador_puerta, self.puerta)
         juego.cTrav.addCollider(colisionador_puerta, juego.cHandler)
 
+class Item():
+    def __init__(self, juego, spawn, modelo, nombre):
+
+        self.item = juego.loader.loadModel(modelo)
+        self.item.setPos(spawn)
+        self.item.reparentTo(juego.render)
+        print(spawn)
+        cn_item = CollisionNode(nombre)
+        cn_item.addSolid(CollisionBox(Point3(.5, .5, .5), 1, 1, 1))
+        self.colisionador_item = self.item.attachNewNode(cn_item)
+        self.colisionador_item.show()
+        juego.pusher.addCollider(self.colisionador_item, self.item)
+        juego.cTrav.addCollider(self.colisionador_item, juego.cHandler)
+        self.puntos = 100
+
+    def eliminar(self):
+        self.item.removeNode()
+
+class Bebida(Item):
+    def __init__(self, juego, spawn):
+        super().__init__(juego,
+                         spawn,
+                        'drink.glb',
+                        'bebida')
+        
+        self.nombre = 'bebida'
+        self.colisionador_item.setScale(2,2,4)
+        self.item.setScale(0.1)
+        self.velocidad = 5
+
+class Botiquin(Item):
+    def __init__(self, juego, spawn):
+        super().__init__(juego, 
+                         spawn,
+                         'medical_kit.glb', 
+                         'botiquin')
+        
+        self.nombre = 'botiquin'
+        self.item.setScale(0.5)
+        self.puntos = 500
+        self.vida = 3
+
+class Dron(Item):
+    def __init__(self, juego, spawn):
+        super().__init__(juego, 
+                         spawn,
+                         'dron.glb', 
+                         'dron')
+        
+        self.nombre = 'dron'
+        self.puntos = 500
+
+        
+
+
+
         

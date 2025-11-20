@@ -30,16 +30,6 @@ class Vecino():
         
         self.puntos = 1000
 
-    def actualizar(self):
-        animacion_especial = self.vecino.getAnimControl('action')
-        if not animacion_especial and not animacion_especial.isPlaying():
-            self.vecino.loop('idle')
-
     def eliminar(self):
         self.vecino.cleanup()
         self.vecino.removeNode()
-
-    # def accion(self):
-    #     if random.random() < 0.01:  
-    #         self.vecino.stop('idle')
-    #         self.vecino.play('action')

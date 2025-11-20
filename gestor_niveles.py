@@ -27,7 +27,7 @@ class Nivel():
         
         self.balas_activas = []
         self.puerta_final = None
-        
+        self.items = []
 
         self.musica_nivel = None
         self.sonido_final_nivel = self.juego.loader.loadSfx("assets/sounds/final.ogg")
@@ -48,6 +48,7 @@ class Nivel():
         self.enemigos_max = self.juego.niveles[self.juego.nivel]['enemigos']
         self.spawnear_enemigos(info_nivel['enemigos'])
         self.spawnear_vecinos(info_nivel['vecinos'])
+        self.spawnear_powerups(info_nivel['powerups'])
         
         if self.gui is None:
             self.gui = Interfaz(self.juego)
@@ -96,7 +97,42 @@ class Nivel():
             self.vecinos.append(vecino)
             self.vecinos_spawn.remove(spawn)
             self.juego.accept(f'personaje_obj-into-{nombre}', self.juego.salvar_vecino)
+
+    def spawnear_powerups(self, cantidad):
+        for i in range(cantidad):
+            spawn = random.choice(self.vecinos_spawn)
+            item = random.choice([Bebida, Dron, Botiquin])
+            powerup = item(self.juego, spawn)
+            nombre = powerup.nombre
+            print(nombre)
+            self.items.append(powerup)
+            self.vecinos_spawn.remove(spawn)
+            self.juego.accept(f'personaje_obj-into-{nombre}', self.boost)
+
+    def boost(self, colision):
+        self.juego.sonido_item.play()
+        nombre = colision.getIntoNode().getName()
+        for powerup in self.items:
+            if powerup.nombre == nombre:
+                self.juego.jugador.actualizar_puntos(powerup.puntos)
+
+                match(nombre):
+                    case 'bebida':
+                        self.juego.jugador.velocidad += powerup.velocidad
+                        self.juego.taskMgr.doMethodLater(5, self.restaurar_velocidad, 'restaurar-velocidad')
+                    case 'botiquin':
+                        self.juego.jugador.actualizar_vida(5)
+                    case 'dron':
+                        pass
+
+                powerup.eliminar()
+                self.items.remove(powerup)
+                break
         
+    def restaurar_velocidad(self, _):    
+        self.juego.jugador.velocidad = 5
+
+
     def actualizar_enemigos(self, dt):
         self.temporizador_spawn -= dt
         
@@ -136,6 +172,9 @@ class Nivel():
         for zombie in self.enemigos[:]:
             zombie.eliminar()
             self.enemigos.remove(zombie)
+        for item in self.items[:]:
+            item.eliminar()
+            self.items.remove(item)
 
         self.mapa.mapa_nodo.removeNode()
         self.enemigos_spawn = self.jugador_spawn = self.vecinos_spawn = []

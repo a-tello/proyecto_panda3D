@@ -112,7 +112,7 @@ class PantallaFinal(Menu):
         pts = OnscreenText(text = f'Puntos: {puntos}', pos = (0, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft,parent = self.menu)
 
 
-        btn = DirectButton(text = 'Reiniciar', command = juego.reiniciar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
+        btn = DirectButton(text = 'Reiniciar', command = juego.jugar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
                         frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton)
         btn.setTransparency(True)
 
