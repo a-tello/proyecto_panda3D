@@ -29,17 +29,21 @@ class MenuPrincipal(Menu):
     def __init__(self, juego):
         super().__init__(juego)
                 
-        btn = DirectButton(text = 'Jugar', command = juego.jugar, pos = (self.aspect-0.5, 0, 0), parent = self.menu, scale = 0.1, frameColor=self.color,
+        btn = DirectButton(text = 'Jugar', command = juego.jugar, pos = (self.aspect-0.5, 0, 0.1), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
                         frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
 
-        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (self.aspect-0.5, 0, -0.3), parent = self.menu, scale = 0.1, frameColor=self.color,
+        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (self.aspect-0.5, 0, -0.2), parent = self.menu, scale = 0.1, frameColor=self.color,
+                        frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
+                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
+        btn.setTransparency(True)
+        btn = DirectButton(text = 'Puntos', command = juego.puntuaciones, pos = (self.aspect-0.5, 0, -0.5), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
                         frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
 
-        btn = DirectButton(text = 'Salir', command = juego.salir, pos = (self.aspect-0.5, 0, -0.6), parent = self.menu, scale = 0.1, frameColor=self.color,
+        btn = DirectButton(text = 'Salir', command = juego.salir, pos = (self.aspect-0.5, 0, -0.8), parent = self.menu, scale = 0.1, frameColor=self.color,
                         frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
                         frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
         btn.setTransparency(True)
@@ -160,7 +164,7 @@ class PantallaFinal(Menu):
         if nombre is None:
             nombre = self.ingreso.get()
         puntos = self.puntos
-        puntaje = {'nombre': nombre, 'puntos': puntos}
+        puntaje = {'nombre': nombre.upper(), 'puntos': puntos}
         print(puntaje)
         self.desbloquear_botones()
         self.juego.guardar_puntos(puntaje)
@@ -171,4 +175,26 @@ class PantallaFinal(Menu):
         self.mensaje_guardado.show()
         self.btn_guardar.hide()
         
+
+class PantallaPuntajes(Menu):
+    def __init__(self, juego):
+        super().__init__(juego)
         
+        self.puntajes = juego.puntajes
+        
+        title = DirectLabel(text = 'PUNTUACIONES', scale = 0.3, pos = (0, 0, 0.75), parent = self.menu, 
+                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
+        
+            
+        for i, jugador in enumerate(self.puntajes):
+            print(jugador)
+            puesto = OnscreenText(text = f'{i+1}.', pos = (-1, 0.5 - i * 0.15), mayChange = True, scale=.2, fg=(1,.5,0,255), align = TextNode.ARight, parent = self.menu
+                            ,font = self.fuente)
+            nombre = OnscreenText(text = jugador['nombre'], pos = (-0.9, 0.5 - i * 0.15), scale=.2, fg=(1,.5,0,255), align = TextNode.ALeft, parent = self.menu
+                            ,font = self.fuente)
+            pts = OnscreenText(text = str(jugador['puntos']), pos = (1, 0.5 - i * 0.15), scale=.2, fg=(1,.5,0,255), align = TextNode.ARight, parent = self.menu
+                            ,font = self.fuente)
+        
+        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
+                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
+        btn.setTransparency(True)

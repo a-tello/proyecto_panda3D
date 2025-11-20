@@ -47,7 +47,10 @@ class Juego(ShowBase):
         # self.fondo.setDepthTest(False)
         # self.fondo.setColorScale(1, 1, 1, 0)
         # self.aparcer(self.fondo, 6)
-
+        
+        self.puntajes = []
+        self.cargar_puntajes()
+    
         # MENU
         self.fuente = self.loader.loadFont('assets/fonts/FEASFBI_.TTF')
         self.menu_principal = MenuPrincipal(self)
@@ -60,6 +63,8 @@ class Juego(ShowBase):
         self.pantalla_final = None
         # self.aparcer(self.menu_principal.menu, 8)
         # self.taskMgr.doMethodLater(6, self.inicio, "show_menu_task")
+        self.pantalla_puntos = PantallaPuntajes(self)
+        self.pantalla_puntos.esconder_menu()
 
         # COLISIONES
         self.cTrav = CollisionTraverser()
@@ -84,8 +89,7 @@ class Juego(ShowBase):
         self.jugador = None
         self.gestor_nivel = None
         self.accept('escape', self.pausa)
-
-    
+        
 
     def actualizar(self, task):
         dt = self.clock.getDt()
@@ -198,6 +202,7 @@ class Juego(ShowBase):
         self.estado = ESTADO['MENU']
         self.menu_opciones.esconder_menu()
         self.menu_pausa.esconder_menu()
+        self.pantalla_puntos.esconder_menu()
         if self.pantalla_final is not None:
             self.pantalla_final.esconder_menu()
         self.menu_principal.mostrar_menu()
@@ -209,6 +214,11 @@ class Juego(ShowBase):
         self.menu_principal.esconder_menu()
         self.menu_pausa.esconder_menu()
         self.menu_opciones.mostrar_menu()
+        
+    def puntuaciones(self):
+        self.menu_principal.esconder_menu()
+        self.pantalla_puntos.mostrar_menu()
+        
         
     def cambiar_pantalla(self, op):
         ancho, alto = op.split(' x ')
@@ -247,10 +257,11 @@ class Juego(ShowBase):
         self.userExit()
 
     def guardar_puntos(self, info):
+        self.puntajes.append(info)
         archivo_nombre = "puntajes.json"
 
-        with open(archivo_nombre, 'a', encoding='utf-8') as archivo:
-            json.dump(info, archivo)
+        with open(archivo_nombre, 'w', encoding='utf-8') as archivo:
+            json.dump(self.puntajes, archivo)
 
         
     def cargar_pantalla_de_carga(self):
@@ -278,6 +289,22 @@ class Juego(ShowBase):
         self.task_mgr.add(self.actualizar, 'actualizar')
         
         return task.done
+
+    def cargar_puntajes(self):
+        nombre_archivo = "puntajes.json"
+
+        try:
+            with open(nombre_archivo, 'r') as archivo:
+                jugadores = json.load(archivo)
+                if jugadores:
+                    puntajes = sorted(jugadores, key=lambda x: x['puntos'], reverse=True)[:10]
+                else: 
+                    puntajes = []
+                    
+        except FileNotFoundError:
+            puntajes = []
+                       
+        self.puntajes = puntajes
 
 juego = Juego()
 juego.run()
