@@ -45,6 +45,7 @@ class Nivel():
         if self.juego.jugador is None:
             self.juego.jugador = Personaje(self.juego, self.jugador_spawn)
 
+        self.juego.jugador.personaje.setPos(self.jugador_spawn)
         self.enemigos_max = self.juego.niveles[self.juego.nivel]['enemigos']
         self.spawnear_enemigos(info_nivel['enemigos'])
         self.spawnear_vecinos(info_nivel['vecinos'])
@@ -76,7 +77,7 @@ class Nivel():
         self.juego.render.setLight(self.luz_ambiente)
 
         dlight = DirectionalLight('directional_light')
-        dlight.setColor((1, 1, 1, 1))
+        dlight.setColor((0.6, 0.6, 0.6, 1))
         dlight.setDirection(Point3(1, -1, -1))
         self.luz_direccional = self.juego.render.attachNewNode(dlight)
         self.juego.render.setLight(self.luz_direccional)
@@ -190,7 +191,6 @@ class Nivel():
         self.musica_nivel.stop()
         self.sonido_final_nivel.play()
         if self.juego.nivel + 1  > len(self.juego.niveles):
-            self.juego.musica_final.play()
             self.juego.terminar_partida('GANASTE. Salvaste a todo el barrio')
         else:
             self.juego.taskMgr.remove('actualizar')
@@ -211,17 +211,3 @@ class Nivel():
     def crear_final(self):
         self.puerta_final = Puerta(self.juego)
         self.juego.accept(f'personaje_obj-into-puerta', self.pasar_nivel)
-        
-    # def reiniciar(self):
-        
-    #     self.juego.taskMgr.remove('actualizar')
-    #     self.musica_nivel.stop()
-    #     self.limpiar_nivel()
-    #     self.juego.nivel = 0
-    #     self.gui.inicializar()
-    #     self.juego.jugador.vida = self.juego.jugador.vida_max
-    #     self.juego.jugador.municion = self.juego.jugador.municion_maxima
-    #     self.juego.jugador.cargador = 90
-    #     self.juego.jugador.puntaje = 0
-    #     self.cargar(self.juego.niveles[self.juego.nivel])
-    #     self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')

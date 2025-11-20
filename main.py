@@ -50,7 +50,7 @@ class Juego(ShowBase):
         self.fondo.setDepthWrite(False)
         self.fondo.setDepthTest(False)
         self.fondo.setColorScale(1, 1, 1, 0)
-        self.aparcer(self.fondo, 6)
+        self.aparcer(self.fondo, 1)
         
         self.puntajes = []
         #self.cargar_puntajes()
@@ -66,7 +66,7 @@ class Juego(ShowBase):
         self.menu_pausa.esconder_menu()
         self.pantalla_final = None
         self.aparcer(self.menu_principal.menu, 8)
-        self.taskMgr.doMethodLater(6, self.inicio, "show_menu_task")
+        self.taskMgr.doMethodLater(1, self.inicio, "show_menu_task")
         self.pantalla_puntos = PantallaPuntajes(self)
         self.pantalla_puntos.esconder_menu()
 
@@ -92,7 +92,7 @@ class Juego(ShowBase):
         self.niveles = [
             #{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 5},
             {'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 3},
-                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 0, 'vecinos': 2,'mapa': 'test.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 1},
+                        {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 1},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl3_music.ogg', 'powerups': 1}]
         
         self.estado = ESTADO['MENU']
@@ -109,14 +109,14 @@ class Juego(ShowBase):
         self.cTrav.traverse(self.render)
 
         if self.jugador.vida < 1:
-            self.terminar_partida()
+            self.terminar_partida('Perdiste. No pudiste salvarlos')
 
         return task.cont
             
 
     def jugar(self):
-        # if self.jugador is not None:
-        #     self.terminar_partida('A')
+        if self.jugador is not None:
+            self.terminar_partida()
         if self.pantalla_final is not None:
             self.pantalla_final.esconder_menu()
         #if self.estado == ESTADO['MENU']:
@@ -200,6 +200,8 @@ class Juego(ShowBase):
     def menu(self):
         self.musica_final.stop()
         self.musica_menu.play()
+        if self.gestor_nivel is not None:
+            self.gestor_nivel.musica_nivel.stop()
         self.fondo.show()
         self.estado = ESTADO['MENU']
         self.menu_opciones.esconder_menu()
@@ -240,6 +242,8 @@ class Juego(ShowBase):
         volumen = self.menu_opciones.volumen['value'] / 1000
         self.musica_menu.setVolume(volumen)
         self.musica_volumen = volumen
+        if self.gestor_nivel is not None:
+            self.gestor_nivel.musica_nivel.setVolume(volumen)
         
 
     def reiniciar(self):
@@ -247,10 +251,17 @@ class Juego(ShowBase):
             self.pantalla_final.esconder_menu()
         #self.jugar()
 
-    def terminar_partida(self, texto):
+    def pantalla_fin(self, texto):
+        self.musica_final.play()
+        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje, texto)
+        
+    
+    def terminar_partida(self, texto=''):
+        if self.jugador is not None:
+            self.gestor_nivel.musica_nivel.stop()
+            self.pantalla_fin(texto)
         self.taskMgr.remove('restaurar-velocidad')
         self.taskMgr.remove('actualizar')
-        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje, texto)
         self.pantalla.setCursorHidden(False)
         self.win.requestProperties(self.pantalla)
         self.jugador.eliminar()
@@ -260,6 +271,8 @@ class Juego(ShowBase):
         self.gestor_nivel = None
         self.nivel = 0
         self.cargar_puntajes()
+
+        
 
     def salir(self):
         self.userExit()
@@ -310,7 +323,7 @@ class Juego(ShowBase):
                 else: 
                     puntajes = []
                     
-        except FileNotFoundError:
+        except:
             puntajes = []
                        
         self.puntajes = puntajes

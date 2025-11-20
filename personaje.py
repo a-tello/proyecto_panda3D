@@ -29,6 +29,13 @@ class Personaje():
         self.personaje.setPos(pos.x, pos.y, 0)
         self.personaje.loop('idle')
 
+        self.raygun = juego.loader.loadModel('assets/raygun.glb')
+        self.raygun.reparentTo(self.personaje)
+        x, y, z = juego.gestor_nivel.jugador_spawn
+        self.raygun.setPos(0,3,2)
+        self.raygun.setScale(2,2,2)
+        self.raygun.setColor(1, 1, 1, 1)
+
         # ATRIBUTOS
         self.vida = 10
         self.vida_max = 10
@@ -55,7 +62,7 @@ class Personaje():
         # CAMARA 
         # juego.cam.setPos(0, -2, 20)
         # juego.cam.setP(-90)
-        juego.cam.setPos(0.5, -.05, .5)  
+        juego.cam.setPos(0, 0, .5)  
         juego.cam.node().getLens().setFov(80)
         self.angulo_horizontal = 0  
         self.angulo_vertical = 0  
@@ -193,7 +200,7 @@ class Personaje():
     def disparar(self):
         if self.cooldown <= 0:                         
             if self.municion == 0:
-                self.cooldown = 3
+                self.cooldown = 2
 
                 if self.municion == 0:
                     if self.cargador >= self.municion_maxima:

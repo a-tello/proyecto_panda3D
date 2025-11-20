@@ -20,16 +20,16 @@ class Bala():
         
 class Puerta():
     def __init__(self, juego):
-        self.puerta = juego.loader.loadModel('models/box')
+        self.puerta = juego.loader.loadModel('assets/portal.glb')
         self.puerta.reparentTo(juego.render)
         x, y, z = juego.gestor_nivel.jugador_spawn
         self.puerta.setPos(x,y,z)
-        self.puerta.setScale(2,2,2)
+        #self.puerta.setScale(2,2,2)
         self.puerta.lookAt(juego.jugador.personaje)
         self.puerta.setColor(1, 1, 1, 1)
 
         cn_puerta = CollisionNode('puerta')
-        cn_puerta.addSolid(CollisionBox(Point3(.5, .5, .5), .5, .5, .5))
+        cn_puerta.addSolid(CollisionBox(Point3(0, 0, 0), 1, 1, .5))
         colisionador_puerta = self.puerta.attachNewNode(cn_puerta)
         colisionador_puerta.show()
         
@@ -43,7 +43,7 @@ class Item():
         self.item.setPos(spawn)
         self.item.reparentTo(juego.render)
         cn_item = CollisionNode(nombre)
-        cn_item.addSolid(CollisionBox(Point3(.5, .5, .5), 1, 1, 1))
+        cn_item.addSolid(CollisionBox(Point3(0.5, 0.5, 0.5), 1, 1, 1))
         self.colisionador_item = self.item.attachNewNode(cn_item)
         self.colisionador_item.show()
         juego.pusher.addCollider(self.colisionador_item, self.item)
