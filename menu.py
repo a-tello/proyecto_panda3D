@@ -27,89 +27,106 @@ class Menu():
         
     def eliminar_menu(self):
         self.menu.removeNode()
+        
+    def crear_boton(self, texto, comando, pos):
+        return DirectButton(text = texto, 
+                            command = comando, 
+                            pos = pos, 
+                            parent = self.menu, 
+                            scale = 0.1, 
+                            frameColor=self.color,
+                            frameSize = (-3, 3, -1, 1),
+                            text_scale = 1.5, 
+                            text_pos = (-0.2, -0.4), 
+                            clickSound = self.sonido_boton, 
+                            text_font = self.fuente,
+                            frameTexture = self.boton_imagenes, 
+                            text_fg = (1,1,1,1))
+    
+    def crear_etiqueta(self, texto, pos):
+        return DirectLabel(text = texto, 
+                            scale = 0.12,
+                            pos = pos,
+                            parent = self.menu,
+                            text_fg = (1, 1, 1, 1), 
+                            frameColor=(0,0,0,0),
+                            frameSize = (-4, 4, -1, 1),
+                            text_pos = (0, -0.2),
+                            text_font = self.fuente)
 
 class MenuPrincipal(Menu):
     def __init__(self, juego):
         super().__init__(juego)
                 
-        btn = DirectButton(text = 'Jugar', command = juego.jugar, pos = (self.aspect-0.5, 0, 0.1), parent = self.menu, scale = 0.1, frameColor=self.color,
-                        frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
-                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
-        btn.setTransparency(True)
-
-        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (self.aspect-0.5, 0, -0.2), parent = self.menu, scale = 0.1, frameColor=self.color,
-                        frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
-                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
-        btn.setTransparency(True)
-        btn = DirectButton(text = 'Puntos', command = juego.puntuaciones, pos = (self.aspect-0.5, 0, -0.5), parent = self.menu, scale = 0.1, frameColor=self.color,
-                        frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
-                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
-        btn.setTransparency(True)
-
-        btn = DirectButton(text = 'Salir', command = juego.salir, pos = (self.aspect-0.5, 0, -0.8), parent = self.menu, scale = 0.1, frameColor=self.color,
-                        frameSize = (-3, 3, -1, 1), text_scale = 1.5, text_pos = (-0.2, -0.4), clickSound = self.sonido_boton, text_font = self.fuente,
-                        frameTexture = self.boton_imagenes, text_fg = (1,1,1,1))
-        btn.setTransparency(True)
-
+        btn_jugar = self.crear_boton('Jugar', juego.jugar, (self.aspect-0.5, 0, 0.1))
+        btn_jugar.setTransparency(True)
+        btn_opc = self.crear_boton('Opciones', juego.opciones, (self.aspect-0.5, 0, -0.2))
+        btn_opc.setTransparency(True)
+        btn_pts = self.crear_boton('Puntos', juego.puntuaciones, (self.aspect-0.5, 0, -0.5))
+        btn_pts.setTransparency(True)
+        btn_salir = self.crear_boton('Salir', juego.salir, (self.aspect-0.5, 0, -0.8))
+        btn_salir.setTransparency(True)
+        
 
 class MenuOpciones(Menu):
     def __init__(self, juego):
         super().__init__(juego)      
 
-        DirectLabel(text = 'Resolución', scale = 0.1, pos = (-.5, 0, 0.6), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
-                    frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
+        self.crear_etiqueta('Resolución', (-.5, 0, 0.6))
+        # DirectLabel(text = 'Resolución', scale = 0.1, pos = (-.5, 0, 0.6), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
+        #             frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
 
         btn = DirectOptionMenu(text='Resolución de pantalla', pos = (.5, 0, 0.6), parent = self.menu, scale=0.1, initialitem=0,
-                        frameSize = (-4, 4, -1, 1), text_scale = 1.1, text_pos = (0, -0.2), command=juego.cambiar_pantalla, text_align=TextNode.ACenter,
-                        items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1, clickSound = self.sonido_boton,
-                        frameTexture = self.boton_imagenes)
+                                frameSize = (-4, 4, -1, 1), text_scale = 1.1, text_pos = (0, -0.2), command=juego.cambiar_pantalla, text_align=TextNode.ACenter, items=['800 x 600','1280 x 960', '1280 x 1024', '1920 x 1080'], 
+                                highlightColor=(0.65, 0.65, 0.65, 1), textMayChange=1, clickSound = self.sonido_boton,                      frameTexture = self.boton_imagenes)
         btn.setTransparency(True)
 
-
-        DirectLabel(text = 'Modo de pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
-                    frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
+        self.crear_etiqueta('Modo de pantalla', (-.5, 0, 0.2))
+        # DirectLabel(text = 'Modo de pantalla', scale = 0.1, pos = (-.5, 0, 0.2), parent = self.menu, text_fg = (1, 1, 1, 1), frameColor=(0,0,0,0),
+        #             frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
         
         botones = [
-        DirectRadioButton(text='Pantalla Completa', variable=[1], value=[0], indicatorValue=False ,scale=0.08, pos=(0.5, 0, .23), command=juego.modo_pantalla, 
-                          parent=self.menu, extraArgs=[True], clickSound = self.sonido_boton, text_font = self.fuente,frameTexture = self.boton_imagenes),
-        DirectRadioButton(text='Modo ventana', variable=[1], value=[1], indicatorValue=False, scale=0.08, pos=(0.43, 0, .10), command=juego.modo_pantalla, 
-                          parent=self.menu, extraArgs=[False], clickSound = self.sonido_boton, text_font = self.fuente,frameTexture = self.boton_imagenes)
+            DirectRadioButton(text='Pantalla Completa', variable=[1], value=[0], indicatorValue=False ,scale=0.08, pos=(0.5, 0, .23), 
+                                command=juego.modo_pantalla, 
+                                parent=self.menu, extraArgs=[True], clickSound = self.sonido_boton, text_font = self.fuente,
+                                frameTexture = self.boton_imagenes),
+            DirectRadioButton(text='Modo ventana', variable=[1], value=[1], indicatorValue=False, scale=0.08, pos=(0.43, 0, .10), 
+                                command=juego.modo_pantalla, 
+                                parent=self.menu, extraArgs=[False], clickSound = self.sonido_boton, text_font = self.fuente,
+                                frameTexture = self.boton_imagenes)
         ]
 
         for boton in botones:
             boton.setOthers(botones)
 
-        
-        DirectLabel(text = 'Musica', scale = 0.1, pos = (-.5, 0, -0.2), parent = self.menu, frameColor=(0,0,0,0),
-                        text_fg = (1, 1, 1, 1),frameSize = (-4, 4, -1, 1), text_pos = (0, -0.2), text_font = self.fuente)
-        self.volumen = DirectSlider(range=(0,100), value=0, pos = (.5, 0, -0.2), pageSize=3, command=juego.musica, scale=0.5, parent=self.menu, frameTexture = self.boton_imagenes)
+        self.crear_etiqueta('Musica', (-.5, 0, -0.2))
+        self.volumen = DirectSlider(range=(0,100), 
+                                    value=0, pos = (.5, 0, -0.2), 
+                                    pageSize=3, 
+                                    command=juego.musica, 
+                                    scale=0.4, 
+                                    parent=self.menu, 
+                                    frameTexture = self.boton_imagenes)
 
-
-        btn = DirectButton(text = 'Volver', command = juego.volver, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, text_fg = (1, 1, 1, 1),
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton, text_font = self.fuente, frameTexture = self.boton_imagenes)
-        btn.setTransparency(True)
+        btn_volver = self.crear_boton('Volver', juego.volver, (0, 0, -0.6))
+        btn_volver.setTransparency(True)
 
 
 class MenuPausa(Menu):
     def __init__(self, juego):
         super().__init__(juego)
         
-
-        title = DirectLabel(text = 'Pausa', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
-                        relief = None,  text_fg = (1, 1, 1, 1))
+        titulo = self.crear_etiqueta('Pausa', (0, 0, 0.8))
+        titulo['text_scale'] = 2
+      
+        btn_continuar = self.crear_boton('Continuar', juego.pausa, (0, 0, 0.4))
+        btn_continuar['text_scale'] = 1.4
+        btn_continuar.setTransparency(True)
+        btn_opc = self.crear_boton('Opciones', juego.opciones, (0, 0, 0))
+        btn_opc.setTransparency(True)
+        btn_menu = self.crear_boton('Menu', juego.menu, (0, 0, -0.4))
+        btn_menu.setTransparency(True)
         
-        btn = DirectButton(text = 'Continuar', command = juego.pausa, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
-        btn.setTransparency(True)
-
-        btn = DirectButton(text = 'Opciones', command = juego.opciones, pos = (0, 0, -0.2), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
-        btn.setTransparency(True)
-
-        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
-        btn.setTransparency(True)
-
 
 class PantallaFinal(Menu):
     def __init__(self, juego, puntos, texto):
@@ -117,41 +134,56 @@ class PantallaFinal(Menu):
         
         self.juego = juego
         self.puntos = puntos
-        title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.3, pos = (0, 0, 0.75), parent = self.menu, 
-                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
-        
-        title = DirectLabel(text = texto, scale = 0.2, pos = (0, 0, 0.50), parent = self.menu, 
-                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
-        
-        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (0, 0.30), mayChange = True, scale=.12, fg=(255,255,255,255), align = TextNode.ACenter, parent = self.menu
-                           ,font = self.fuente)
+        titulo = self.crear_etiqueta('JUEGO TEMRINADO', (0, 0, 0.75))
+        titulo['text_scale'] = 2
+        titulo = self.crear_etiqueta(texto, (0, 0, 0.50))
+        titulo['scale'] = 1
+        titulo = self.crear_etiqueta(f'Puntos: {puntos}', (0, 0, 0.30))
+        titulo['scale'] = 0.8
 
-
-        self.ingreso = DirectEntry( text="", scale=0.2, width=5, pos=(0, 0, 0), initialText="Escribe aquí", numLines=1, focus=1, 
-                            cursorKeys=1, command=self.guardar_puntos, text_font=self.fuente,parent=self.menu,text_align=TextNode.ACenter)
+        self.ingreso = DirectEntry( text="", 
+                                    scale=0.2, 
+                                    width=5, 
+                                    pos=(0, 0, 0), 
+                                    initialText="Nombre", 
+                                    numLines=1, 
+                                    focusInCommand=self.limpiar_texto,
+                                    frameColor=(1,1,1,1), 
+                                    cursorKeys=1, 
+                                    command=self.guardar_puntos, 
+                                    text_fg = (0,0,0,0.2),
+                                    text_font=self.fuente,
+                                    parent=self.menu,
+                                    text_align=TextNode.ACenter)
         
-        self.btn_guardar = DirectButton(text = 'Guardar',  pos = (0, 0, -0.3), parent = self.menu, scale = 0.1,
-                        frameSize = (-4, 4, -1, 1), text_scale = 1.5, text_pos = (0, -0.4),  text_font = self.fuente,text_align=TextNode.ACenter,
-                        command=self.guardar_puntos)
+        self.btn_guardar = self.crear_boton('Guardar', self.guardar_puntos, (0, 0, -0.3))
+
         self.btn_guardar.setTransparency(True)
         
-        self.mensaje_guardado = OnscreenText(text = f'Guardado', pos = (0, -0.25), scale=.12, fg=(255,255,255,255), align = TextNode.ACenter, parent = self.menu
-                           ,font = self.fuente)
+        self.mensaje_guardado = OnscreenText(text = f'Guardado', 
+                                            pos = (0, -0.25), 
+                                            scale=.12, 
+                                            fg=(255,255,255,255), 
+                                            align = TextNode.ACenter, 
+                                            parent = self.menu,
+                                            font = self.fuente)
         self.mensaje_guardado.hide()
         
-        self.btn_r = DirectButton(text = 'Reiniciar',  pos = (-0.5, 0, -0.5), parent = self.menu, scale = 0.1,
-                        frameSize = (-4, 4, -1, 1), text_scale = 1.5, text_pos = (0, -0.4),  text_font = self.fuente,text_align=TextNode.ACenter, command = juego.jugar)
+        
+        self.btn_r = self.crear_boton('Reiniciar', juego.jugar, (-0.5, 0, -0.5))
         self.btn_r.setTransparency(True)
-
-        self.btn_m = DirectButton(text = 'Menú principal',  pos = (0.5, 0, -0.5), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 1.2, text_pos = (0, -0.4), text_font = self.fuente,text_align=TextNode.ACenter,command = juego.menu)
-        self.btn_m.setTransparency(True)
         self.btn_r.hide()
+        self.btn_m = self.crear_boton('Menu', juego.menu, (0.5, 0, -0.5))
+        self.btn_m.setTransparency(True)
         self.btn_m.hide()
         
         self.nombre_len = 10
         juego.taskMgr.add(self.limitar_texto, "limitarEntradas")
 
+    def limpiar_texto(self):
+        self.ingreso.enterText('')
+        self.ingreso['text_fg']=(0,0,0,1)
+        
     def limitar_texto(self, _):
         texto = self.ingreso.get()
         texto_filtrado = ''.join(c for c in texto if c.isalpha())
@@ -166,11 +198,12 @@ class PantallaFinal(Menu):
     def guardar_puntos(self, nombre=None):
         if nombre is None:
             nombre = self.ingreso.get()
-        puntos = self.puntos
-        puntaje = {'nombre': nombre.upper(), 'puntos': puntos}
-        print(puntaje)
-        self.desbloquear_botones()
-        self.juego.guardar_puntos(puntaje)
+            
+        if len(nombre) > 2:
+            puntos = self.puntos
+            puntaje = {'nombre': nombre.upper(), 'puntos': puntos}
+            self.desbloquear_botones()
+            self.juego.guardar_puntos(puntaje)
         
     def desbloquear_botones(self):
         self.btn_r.show()
@@ -198,6 +231,5 @@ class PantallaPuntajes(Menu):
             pts = OnscreenText(text = str(jugador['puntos']), pos = (1, 0.5 - i * 0.15), scale=.2, fg=(1,.5,0,255), align = TextNode.ARight, parent = self.menu
                             ,font = self.fuente)
         
-        btn = DirectButton(text = 'Volver al menú', command = juego.menu, pos = (0, 0, -0.6), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2))
-        btn.setTransparency(True)
+        btn_menu = self.crear_boton('Menu', juego.menu, (0, 0, -0.6))
+        btn_menu.setTransparency(True)
