@@ -39,28 +39,39 @@ En cada nivel encontrarás una cantidad de vecinos a salvar mientras luchas por 
 ```bash
   git clone https://github.com/a-tello/proyecto_panda3D.git
 ```
+
+### 2) Cambiar el directorio
+
+```bash
+  cd proyecto_panda3D/
+```
     
-### 2) Crear entorno virtual
+### 3) Crear entorno virtual
 
 ```bash
   python -m venv venv_juego
 ```
 
-### 3)  Activar entorno virtual
+### 4)  Activar entorno virtual
+#### Windows:
 
 ```bash
-  .\venv_juego\Scripts\activate
+  venv_juego\Scripts\activate
+```
+#### Linux (GitBash):
+
+```bash
+  source venv_juego/Scripts/activate
 ```
 
-### 4) Instalar dependencias
+### 5) Instalar dependencias
 
 ```bash
   pip install -r requirements.txt
 ```
 
-### 5) Correr el juego
+### 6) Correr el juego
 
 ```bash
   python main.py
 ```
-    
