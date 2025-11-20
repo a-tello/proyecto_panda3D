@@ -49,7 +49,7 @@ class Juego(ShowBase):
         # self.aparcer(self.fondo, 6)
         
         self.puntajes = []
-        self.cargar_puntajes()
+        #self.cargar_puntajes()
     
         # MENU
         self.fuente = self.loader.loadFont('assets/fonts/FEASFBI_.TTF')
@@ -122,12 +122,12 @@ class Juego(ShowBase):
     #     self.pantalla_final.esconder_menu()
         self.musica_menu.stop()
 
+        self.cargar_pantalla_de_carga()
         self.gestor_nivel = Nivel(self)
         nivel = self.niveles[self.nivel]
         self.gestor_nivel.cargar(nivel)
         self.estado = ESTADO['JUGANDO']
         self.taskMgr.add(self.actualizar, 'actualizar')
-        self.cargar_pantalla_de_carga()
 
     def impacto(self, colision):
         # enemigos = self.gestor_nivel.enemigos
@@ -216,6 +216,9 @@ class Juego(ShowBase):
         self.menu_opciones.mostrar_menu()
         
     def puntuaciones(self):
+        self.pantalla_puntos.eliminar_menu()
+        self.cargar_puntajes()
+        self.pantalla_puntos = PantallaPuntajes(self)
         self.menu_principal.esconder_menu()
         self.pantalla_puntos.mostrar_menu()
         
@@ -252,6 +255,7 @@ class Juego(ShowBase):
         self.gestor_nivel.gui.menu.removeNode()
         self.gestor_nivel = None
         self.nivel = 0
+        self.cargar_puntajes()
 
     def salir(self):
         self.userExit()
@@ -286,7 +290,7 @@ class Juego(ShowBase):
         self.menu_fondo.destroy()
         self.mensaje.removeNode()
 
-        self.task_mgr.add(self.actualizar, 'actualizar')
+        #self.task_mgr.add(self.actualizar, 'actualizar')
         
         return task.done
 

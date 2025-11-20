@@ -189,6 +189,7 @@ class Nivel():
         self.juego.taskMgr.remove('actualizar')
         self.musica_nivel.stop()
         self.sonido_final_nivel.play()
+        self.juego.cargar_pantalla_de_carga()
         self.limpiar_nivel()
         self.juego.nivel += 1
         self.juego.jugador.vida = self.juego.jugador.vida_max
@@ -198,7 +199,6 @@ class Nivel():
         self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
         self.cargar(self.juego.niveles[self.juego.nivel])
         self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
-        self.juego.cargar_pantalla_de_carga()
 
     def mutear_zombies(self):
         for zombie in self.enemigos:

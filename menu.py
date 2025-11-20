@@ -24,6 +24,9 @@ class Menu():
     def mostrar_menu(self):
         self.menu_fondo.show()
         self.menu.show()
+        
+    def eliminar_menu(self):
+        self.menu.removeNode()
 
 class MenuPrincipal(Menu):
     def __init__(self, juego):
