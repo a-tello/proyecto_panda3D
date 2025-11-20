@@ -17,19 +17,22 @@ class Personaje():
         self.juego = juego
         
         # MODELO
-        self.personaje = Actor('assets/models/act_p3d_chan', {
-                            'stand' : 'assets/models/a_p3d_chan_idle',
-                            'run' : 'assets/models/a_p3d_chan_run'
+        self.personaje = Actor('remy_idle.glb', {
+                            'idle' : 'remy_idle.glb',
+                            'run' : 'remy_run.glb'
                         })
         self.personaje.setPos(spawn)
         self.personaje.getChild(0).setH(180)
         self.personaje.reparentTo(self.juego.render)
-        self.personaje.loop('stand')
+        self.personaje.setScale(0.5)
+        pos = self.personaje.getPos()
+        self.personaje.setPos(pos.x, pos.y, 0)
+        self.personaje.loop('idle')
 
         # ATRIBUTOS
-        self.vida = 1
-        self.vida_max = 1
-        self.velocidad = 20
+        self.vida = 10
+        self.vida_max = 10
+        self.velocidad = 5
         self.ataque = 3
 
         # TECLAS
@@ -52,7 +55,7 @@ class Personaje():
         # CAMARA 
         # juego.cam.setPos(0, -2, 20)
         # juego.cam.setP(-90)
-        juego.cam.setPos(0, -2, .5)  
+        juego.cam.setPos(0.5, -.05, .5)  
         juego.cam.node().getLens().setFov(80)
         self.angulo_horizontal = 0  
         self.angulo_vertical = 0  
@@ -64,8 +67,8 @@ class Personaje():
 
         # COLISION (con paredes y enemigos)
         cn_jugador = CollisionNode('personaje')
-        cn_jugador.addSolid(CollisionSphere(0, 0, 1, 0.3))
-        cn_jugador.addSolid(CollisionBox(Point3(0, 0, 1), 0.3, 0.3, 1))
+        #cn_jugador.addSolid(CollisionSphere(0, 0, 1, 0.3))
+        cn_jugador.addSolid(CollisionBox(Point3(0, 0.2, 2), 0.3, 0.3, 1))
         self.colisionador = self.personaje.attachNewNode(cn_jugador)
         self.colisionador.setPythonTag('owner', self)
         cn_jugador.setFromCollideMask(BitMask32.bit(1) | BitMask32.bit(2) )
@@ -77,12 +80,13 @@ class Personaje():
         
         # COLISION (con NPCs y objetos)
         cn_jugador_obj = CollisionNode('personaje_obj')
-        cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
+        cn_jugador_obj.addSolid(CollisionBox(Point3(0, 0.2, 1.5), 0.3, 0.3, 1))
+        #cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador_obj = self.personaje.attachNewNode(cn_jugador_obj)
         self.colisionador_obj.setPythonTag('owner', self)
         cn_jugador_obj.setFromCollideMask(BitMask32.bit(2))
         cn_jugador_obj.setIntoCollideMask(BitMask32.allOff())
-
+        self.colisionador.show()
         self.juego.cTrav.addCollider(self.colisionador_obj, self.juego.cHandler)
         
         # DISPAROS
@@ -158,7 +162,7 @@ class Personaje():
 
         # ANIMACION
         if self.movimiento:
-            animacion_quieto = self.personaje.getAnimControl('stand')
+            animacion_quieto = self.personaje.getAnimControl('idle')
             animacion_caminar = self.personaje.getAnimControl('run')
 
             if animacion_quieto and animacion_quieto.isPlaying():
@@ -167,10 +171,10 @@ class Personaje():
             if animacion_caminar and not animacion_caminar.isPlaying():
                 self.personaje.loop('run')
         else:
-            animacion_quieto = self.personaje.getAnimControl('stand')
+            animacion_quieto = self.personaje.getAnimControl('idle')
             if animacion_quieto and not animacion_quieto.isPlaying():
                 self.personaje.stop('run')
-                self.personaje.loop('stand')  
+                self.personaje.loop('idle')  
                 
                 
         if self.teclas['disparar']:
