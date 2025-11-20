@@ -42,7 +42,6 @@ class Item():
         self.item = juego.loader.loadModel(modelo)
         self.item.setPos(spawn)
         self.item.reparentTo(juego.render)
-        print(spawn)
         cn_item = CollisionNode(nombre)
         cn_item.addSolid(CollisionBox(Point3(.5, .5, .5), 1, 1, 1))
         self.colisionador_item = self.item.attachNewNode(cn_item)

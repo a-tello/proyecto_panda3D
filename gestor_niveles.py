@@ -105,7 +105,6 @@ class Nivel():
             item = random.choice([Bebida, Dron, Botiquin])
             powerup = item(self.juego, spawn)
             nombre = powerup.nombre
-            print(nombre)
             self.items.append(powerup)
             self.vecinos_spawn.remove(spawn)
             self.juego.accept(f'personaje_obj-into-{nombre}', self.boost)
@@ -188,12 +187,13 @@ class Nivel():
 
     def pasar_nivel(self, _):
         self.juego.nivel += 1
+        self.musica_nivel.stop()
+        self.sonido_final_nivel.play()
         if self.juego.nivel + 1  > len(self.juego.niveles):
+            self.juego.musica_final.play()
             self.juego.terminar_partida('GANASTE. Salvaste a todo el barrio')
         else:
             self.juego.taskMgr.remove('actualizar')
-            self.musica_nivel.stop()
-            self.sonido_final_nivel.play()
             self.juego.cargar_pantalla_de_carga()
             self.limpiar_nivel()
             self.juego.jugador.vida = self.juego.jugador.vida_max

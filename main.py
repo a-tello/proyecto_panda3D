@@ -1,5 +1,6 @@
 import json
 from direct.gui.OnscreenText import OnscreenText
+from direct.gui.OnscreenImage import OnscreenImage
 from panda3d.core import TextNode
 from gestor_niveles import Nivel
 from menu import *
@@ -28,10 +29,13 @@ class Juego(ShowBase):
         # MUSICA
         self.musica_menu = self.loader.loadMusic("assets/sounds/menu_music.ogg")
         self.musica_menu.setLoop(True)
-        #self.musica_volumen = 0.075
-        self.musica_volumen = 0.0
+        self.musica_volumen = 0.075
         self.musica_menu.setVolume(self.musica_volumen)
         self.musica_menu.play()
+        self.musica_final = self.loader.loadMusic('assets/sounds/pantalla_final.ogg')
+        self.musica_final.setLoop(True)
+        self.musica_final.setVolume(self.musica_volumen)
+        
 
         # SONIDOS
         self.sonido_item = self.loader.loadSfx("assets/sounds/item.ogg")
@@ -39,14 +43,14 @@ class Juego(ShowBase):
 
 
         # FONDO
-        # aspectRatio = self.getAspectRatio()
-        # self.fondo = OnscreenImage("fondo.jpg", pos=(-.2, -1, 0), scale=(aspectRatio, 1, 1) )
-        # self.fondo.reparentTo(self.render2d)
-        # self.fondo.setTransparency(TransparencyAttrib.M_alpha)
-        # self.fondo.setDepthWrite(False)
-        # self.fondo.setDepthTest(False)
-        # self.fondo.setColorScale(1, 1, 1, 0)
-        # self.aparcer(self.fondo, 6)
+        aspectRatio = self.getAspectRatio()
+        self.fondo = OnscreenImage("fondo.jpg", pos=(-.2, -1, 0), scale=(aspectRatio, 1, 1) )
+        self.fondo.reparentTo(self.render2d)
+        self.fondo.setTransparency(TransparencyAttrib.M_alpha)
+        self.fondo.setDepthWrite(False)
+        self.fondo.setDepthTest(False)
+        self.fondo.setColorScale(1, 1, 1, 0)
+        self.aparcer(self.fondo, 6)
         
         self.puntajes = []
         #self.cargar_puntajes()
@@ -54,15 +58,15 @@ class Juego(ShowBase):
         # MENU
         self.fuente = self.loader.loadFont('assets/fonts/FEASFBI_.TTF')
         self.menu_principal = MenuPrincipal(self)
-        # self.menu_principal.menu.setColorScale(1, 1, 1, 0)   
-        # self.menu_principal.esconder_menu()
+        self.menu_principal.menu.setColorScale(1, 1, 1, 0)   
+        self.menu_principal.esconder_menu()
         self.menu_opciones = MenuOpciones(self)
         self.menu_opciones.esconder_menu()
         self.menu_pausa = MenuPausa(self)
         self.menu_pausa.esconder_menu()
         self.pantalla_final = None
-        # self.aparcer(self.menu_principal.menu, 8)
-        # self.taskMgr.doMethodLater(6, self.inicio, "show_menu_task")
+        self.aparcer(self.menu_principal.menu, 8)
+        self.taskMgr.doMethodLater(6, self.inicio, "show_menu_task")
         self.pantalla_puntos = PantallaPuntajes(self)
         self.pantalla_puntos.esconder_menu()
 
@@ -76,7 +80,7 @@ class Juego(ShowBase):
         self.cTrav.setRespectPrevTransform(True)
 
         # CAMARA
-        #self.disableMouse()
+        self.disableMouse()
 
         self.nivel = 0
         # self.niveles = [
@@ -106,10 +110,6 @@ class Juego(ShowBase):
 
         if self.jugador.vida < 1:
             self.terminar_partida()
-        #     self.taskMgr.remove('actualizar')
-        #     self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
-        #     self.pantalla.setCursorHidden(False)
-        #     self.win.requestProperties(self.pantalla)
 
         return task.cont
             
@@ -120,13 +120,14 @@ class Juego(ShowBase):
         if self.pantalla_final is not None:
             self.pantalla_final.esconder_menu()
         #if self.estado == ESTADO['MENU']:
-        #self.fondo.hide()
+        self.fondo.hide()
         self.menu_principal.esconder_menu()
         self.pantalla.setCursorHidden(True)
         self.win.requestProperties(self.pantalla)
     # if self.pantalla_final is not None:
     #     self.pantalla_final.esconder_menu()
         self.musica_menu.stop()
+        self.musica_final.stop()
 
         self.gestor_nivel = Nivel(self)
         nivel = self.niveles[self.nivel]
@@ -142,15 +143,7 @@ class Juego(ShowBase):
         bala_np = colision.getFromNodePath().get_parent()
         bala_np.removeNode()
         
-        
         self.gestor_nivel.impacto_enemigos(id_enemigo)
-        # for enemigo in enemigos:
-        #     if id_enemigo == str(enemigo.id):
-        #         enemigo.actualizar_vida(-self.jugador.ataque)
-        #         if enemigo.vida < 1:
-        #             enemigos.remove(enemigo)
-        #             enemigos_muertos.append(enemigo)
-        #             enemigo.morir()
 
     def salvar_vecino(self, colision):
         self.sonido_item.play()
@@ -205,6 +198,9 @@ class Juego(ShowBase):
         self.aparcer(self.menu_principal.menu, 3)
 
     def menu(self):
+        self.musica_final.stop()
+        self.musica_menu.play()
+        self.fondo.show()
         self.estado = ESTADO['MENU']
         self.menu_opciones.esconder_menu()
         self.menu_pausa.esconder_menu()
@@ -214,6 +210,7 @@ class Juego(ShowBase):
         self.menu_principal.mostrar_menu()
         
     def opciones(self):
+        self.fondo.hide()
         if self.estado == ESTADO['PAUSA']:
             self.ignore('escape')
         
@@ -222,6 +219,7 @@ class Juego(ShowBase):
         self.menu_opciones.mostrar_menu()
         
     def puntuaciones(self):
+        self.fondo.hide()
         self.pantalla_puntos.eliminar_menu()
         self.cargar_puntajes()
         self.pantalla_puntos = PantallaPuntajes(self)

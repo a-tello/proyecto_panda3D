@@ -7,7 +7,7 @@ from direct.task import Task
 class Menu():
     def __init__(self, juego):
         self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
-        self.menu = DirectFrame(frameColor = (1, 1, 1, 0))
+        self.menu = DirectFrame(frameColor = (0, 0, 0, 1))
         
         self.aspect = juego.getAspectRatio()
         self.color = (11/255.0, 96/255.0, 13/255.0, 1)
@@ -101,7 +101,8 @@ class MenuOpciones(Menu):
 
         self.crear_etiqueta('Musica', (-.5, 0, -0.2))
         self.volumen = DirectSlider(range=(0,100), 
-                                    value=0, pos = (.5, 0, -0.2), 
+                                    value=100, 
+                                    pos = (.5, 0, -0.2), 
                                     pageSize=3, 
                                     command=juego.musica, 
                                     scale=0.4, 
@@ -223,7 +224,6 @@ class PantallaPuntajes(Menu):
         
             
         for i, jugador in enumerate(self.puntajes):
-            print(jugador)
             puesto = OnscreenText(text = f'{i+1}.', pos = (-1, 0.5 - i * 0.15), mayChange = True, scale=.2, fg=(1,.5,0,255), align = TextNode.ARight, parent = self.menu
                             ,font = self.fuente)
             nombre = OnscreenText(text = jugador['nombre'], pos = (-0.9, 0.5 - i * 0.15), scale=.2, fg=(1,.5,0,255), align = TextNode.ALeft, parent = self.menu
