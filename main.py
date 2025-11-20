@@ -1,3 +1,4 @@
+import json
 from direct.gui.OnscreenText import OnscreenText
 from panda3d.core import TextNode
 from gestor_niveles import Nivel
@@ -48,6 +49,7 @@ class Juego(ShowBase):
         # self.aparcer(self.fondo, 6)
 
         # MENU
+        self.fuente = self.loader.loadFont('assets/fonts/FEASFBI_.TTF')
         self.menu_principal = MenuPrincipal(self)
         # self.menu_principal.menu.setColorScale(1, 1, 1, 0)   
         # self.menu_principal.esconder_menu()
@@ -229,11 +231,9 @@ class Juego(ShowBase):
         #self.jugar()
 
     def terminar_partida(self):
-        nodos_hijos = render.get_children()
-        print(len(nodos_hijos))
-
+        self.taskMgr.remove('restaurar-velocidad')
         self.taskMgr.remove('actualizar')
-        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje)
+        self.pantalla_final = PantallaFinal(juego, self.jugador.puntaje, 'PERDISTE')
         self.pantalla.setCursorHidden(False)
         self.win.requestProperties(self.pantalla)
         self.jugador.eliminar()
@@ -246,16 +246,25 @@ class Juego(ShowBase):
     def salir(self):
         self.userExit()
 
+    def guardar_puntos(self, info):
+        archivo_nombre = "puntajes.json"
+
+        with open(archivo_nombre, 'a', encoding='utf-8') as archivo:
+            json.dump(info, archivo)
+
+        
     def cargar_pantalla_de_carga(self):
         self.task_mgr.remove('actualizar')
         self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
 
         self.pantalla_carga = DirectFrame(frameColor = (1, 1, 1, 1), parent = self.render2d)
-        texto_obj = TextNode('texto')
-        texto_obj.setText(self.niveles[self.nivel]['nivel'])
-        texto_node = self.render2d.attachNewNode(texto_obj)
-        texto_node.setScale(0.1)
-        texto_node.setPos(0, 0, 0.5) 
+        texto = TextNode('texto')
+        texto.setAlign(TextNode.ACenter)
+        texto.setText(self.niveles[self.nivel]['nivel'])
+        texto.setFont(self.fuente)
+        texto_node = self.render2d.attachNewNode(texto)
+        texto_node.setScale(.2)
+        texto_node.setPos(0, 0, 0) 
         self.mensaje = texto_node
         
         self.taskMgr.doMethodLater(5.0, self.cargar_nivel, 'cargar-nivel')  

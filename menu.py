@@ -1,6 +1,8 @@
-from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton, DirectDialog
+from direct.gui.DirectGui import DirectFrame, DirectButton, DirectLabel, DirectOptionMenu, DirectSlider, DirectRadioButton, DirectEntry
 from panda3d.core import TextNode
 from direct.gui.OnscreenText import OnscreenText
+from direct.task import Task
+
 
 class Menu():
     def __init__(self, juego):
@@ -11,7 +13,7 @@ class Menu():
         self.color = (11/255.0, 96/255.0, 13/255.0, 1)
         self.sonido_boton = juego.loader.loadSfx('assets/sounds/boton.ogg')
         self.sonido_boton.setVolume(0.5)
-        self.fuente = juego.loader.loadFont('assets/fonts/FEASFBI_.TTF')
+        self.fuente = juego.fuente
         self.boton_imagenes = [juego.loader.loadTexture('assets/GUI/Button/Rect/Default.png'),
                                juego.loader.loadTexture('assets/GUI/Button/Rect/Default.png')]
 
@@ -103,19 +105,70 @@ class MenuPausa(Menu):
 
 
 class PantallaFinal(Menu):
-    def __init__(self, juego, puntos):
+    def __init__(self, juego, puntos, texto):
         super().__init__(juego)
         
-        title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.1, pos = (0, 0, 0.9), parent = self.menu, 
-                        relief = None,  text_fg = (1, 1, 1, 1))
+        self.juego = juego
+        self.puntos = puntos
+        title = DirectLabel(text = 'JUEGO TEMRINADO', scale = 0.3, pos = (0, 0, 0.75), parent = self.menu, 
+                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
         
-        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (0, .75), mayChange = True, scale=.1, fg=(255,255,255,255), align = TextNode.ALeft,parent = self.menu)
+        title = DirectLabel(text = texto, scale = 0.2, pos = (0, 0, 0.50), parent = self.menu, 
+                        relief = None,  text_fg = (1, 1, 1, 1), text_font = self.fuente)
+        
+        pts = OnscreenText(text = f'Puntos: {puntos}', pos = (0, 0.30), mayChange = True, scale=.12, fg=(255,255,255,255), align = TextNode.ACenter, parent = self.menu
+                           ,font = self.fuente)
 
 
-        btn = DirectButton(text = 'Reiniciar', command = juego.jugar, pos = (0, 0, 0.2), parent = self.menu, scale = 0.1,
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton)
-        btn.setTransparency(True)
+        self.ingreso = DirectEntry( text="", scale=0.2, width=5, pos=(0, 0, 0), initialText="Escribe aquí", numLines=1, focus=1, 
+                            cursorKeys=1, command=self.guardar_puntos, text_font=self.fuente,parent=self.menu,text_align=TextNode.ACenter)
+        
+        self.btn_guardar = DirectButton(text = 'Guardar',  pos = (0, 0, -0.3), parent = self.menu, scale = 0.1,
+                        frameSize = (-4, 4, -1, 1), text_scale = 1.5, text_pos = (0, -0.4),  text_font = self.fuente,text_align=TextNode.ACenter,
+                        command=self.guardar_puntos)
+        self.btn_guardar.setTransparency(True)
+        
+        self.mensaje_guardado = OnscreenText(text = f'Guardado', pos = (0, -0.25), scale=.12, fg=(255,255,255,255), align = TextNode.ACenter, parent = self.menu
+                           ,font = self.fuente)
+        self.mensaje_guardado.hide()
+        
+        self.btn_r = DirectButton(text = 'Reiniciar',  pos = (-0.5, 0, -0.5), parent = self.menu, scale = 0.1,
+                        frameSize = (-4, 4, -1, 1), text_scale = 1.5, text_pos = (0, -0.4),  text_font = self.fuente,text_align=TextNode.ACenter, command = juego.jugar)
+        self.btn_r.setTransparency(True)
 
-        btn = DirectButton(text = 'Menú principal', command = juego.menu, pos = (0, 0, -0.2), parent = self.menu, scale = 0.1, 
-                        frameSize = (-4, 4, -1, 1), text_scale = 0.75, text_pos = (0, -0.2), clickSound = self.sonido_boton)
-        btn.setTransparency(True)
+        self.btn_m = DirectButton(text = 'Menú principal',  pos = (0.5, 0, -0.5), parent = self.menu, scale = 0.1, 
+                        frameSize = (-4, 4, -1, 1), text_scale = 1.2, text_pos = (0, -0.4), text_font = self.fuente,text_align=TextNode.ACenter,command = juego.menu)
+        self.btn_m.setTransparency(True)
+        self.btn_r.hide()
+        self.btn_m.hide()
+        
+        self.nombre_len = 10
+        juego.taskMgr.add(self.limitar_texto, "limitarEntradas")
+
+    def limitar_texto(self, _):
+        texto = self.ingreso.get()
+        texto_filtrado = ''.join(c for c in texto if c.isalpha())
+
+        texto_filtrado = texto_filtrado[:self.nombre_len]
+
+        if texto != texto_filtrado:
+            self.ingreso.set(texto_filtrado)
+
+        return Task.cont
+    
+    def guardar_puntos(self, nombre=None):
+        if nombre is None:
+            nombre = self.ingreso.get()
+        puntos = self.puntos
+        puntaje = {'nombre': nombre, 'puntos': puntos}
+        print(puntaje)
+        self.desbloquear_botones()
+        self.juego.guardar_puntos(puntaje)
+        
+    def desbloquear_botones(self):
+        self.btn_r.show()
+        self.btn_m.show()
+        self.mensaje_guardado.show()
+        self.btn_guardar.hide()
+        
+        

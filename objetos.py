@@ -58,7 +58,7 @@ class Bebida(Item):
     def __init__(self, juego, spawn):
         super().__init__(juego,
                          spawn,
-                        'drink.glb',
+                        'assets/drink.glb',
                         'bebida')
         
         self.nombre = 'bebida'
@@ -70,7 +70,7 @@ class Botiquin(Item):
     def __init__(self, juego, spawn):
         super().__init__(juego, 
                          spawn,
-                         'medical_kit.glb', 
+                         'assets/medical_kit.glb', 
                          'botiquin')
         
         self.nombre = 'botiquin'
@@ -82,7 +82,7 @@ class Dron(Item):
     def __init__(self, juego, spawn):
         super().__init__(juego, 
                          spawn,
-                         'dron.glb', 
+                         'assets/dron.glb', 
                          'dron')
         
         self.nombre = 'dron'

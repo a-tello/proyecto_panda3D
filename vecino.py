@@ -11,7 +11,7 @@ from direct.gui.OnscreenImage import OnscreenImage
 class Vecino():
     def __init__(self, juego, tipo, pos, nombre):
         #self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/boss.glb', '3':'assets/models/boss.glb', '4':'assets/models/boss.glb', '5':'assets/models/boss.glb'}
-        self.modelos = {'1':'boss.glb', '2':'peasant.glb', '3':'AJ.glb', '4':'Amy.glb', '5':'Kaya.glb'}
+        self.modelos = {'1':'assets/models/boss.glb', '2':'assets/models/peasant.glb', '3':'assets/models/AJ.glb', '4':'assets/models/Amy.glb', '5':'assets/models/Kaya.glb'}
         self.vecino = Actor(self.modelos[tipo], {'idle': self.modelos[tipo], 'action': self.modelos[tipo]})
         self.vecino.setPos(pos)
         self.vecino.reparentTo(juego.render)

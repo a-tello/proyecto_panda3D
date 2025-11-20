@@ -17,9 +17,9 @@ class Personaje():
         self.juego = juego
         
         # MODELO
-        self.personaje = Actor('remy_idle.glb', {
-                            'idle' : 'remy_idle.glb',
-                            'run' : 'remy_run.glb'
+        self.personaje = Actor('assets/models/remy_idle.glb', {
+                            'idle' : 'assets/models/remy_idle.glb',
+                            'run' : 'assets/models/remy_run.glb'
                         })
         self.personaje.setPos(spawn)
         self.personaje.getChild(0).setH(180)
@@ -30,7 +30,7 @@ class Personaje():
         self.personaje.loop('idle')
 
         # ATRIBUTOS
-        self.vida = 10
+        self.vida = 1
         self.vida_max = 10
         self.velocidad = 5
         self.ataque = 3
