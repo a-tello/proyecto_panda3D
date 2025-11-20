@@ -197,12 +197,13 @@ class Nivel():
         self.gui.inicializar()
         self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
         self.cargar(self.juego.niveles[self.juego.nivel])
-        print(self.gui)
-        #self.gui.mostrar()
         self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')
+        self.juego.cargar_pantalla_de_carga()
 
-        # self.juego.jugar()
-        
+    def mutear_zombies(self):
+        for zombie in self.enemigos:
+            zombie.sonido_zombie.stop()
+
     def crear_final(self):
         self.puerta_final = Puerta(self.juego)
         self.juego.accept(f'personaje_obj-into-puerta', self.pasar_nivel)

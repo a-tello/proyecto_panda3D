@@ -72,7 +72,8 @@ class Juego(ShowBase):
         #self.disableMouse()
 
         self.nivel = 0
-        self.niveles = [{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 5},
+        self.niveles = [
+            #{'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 0, 'vecinos': 1, 'mapa': 'test.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 5},
             {'nivel': 'Nivel 1\nPánico en el vecindario', 'enemigos': 2, 'vecinos': 1, 'mapa': 'assets/maps/lvl1.png', 'musica': 'assets/sounds/lvl1_music.ogg', 'powerups': 3},
                         {'nivel': 'Nivel 2\nUn poco de suerte', 'enemigos': 10, 'vecinos': 2,'mapa': 'assets/maps/lvl2.png', 'musica': 'assets/sounds/lvl2_music.ogg', 'powerups': 5},
                         {'nivel': 'Nivel 3\n¡SALVA A TODOS!', 'enemigos': 30, 'vecinos': 12, 'mapa': 'assets/maps/lvl3.png', 'musica': 'assets/sounds/lvl3_music.ogg', 'powerups': 7}]
@@ -120,6 +121,7 @@ class Juego(ShowBase):
         self.gestor_nivel.cargar(nivel)
         self.estado = ESTADO['JUGANDO']
         self.taskMgr.add(self.actualizar, 'actualizar')
+        self.cargar_pantalla_de_carga()
 
     def impacto(self, colision):
         # enemigos = self.gestor_nivel.enemigos
@@ -160,6 +162,7 @@ class Juego(ShowBase):
             self.pantalla.setCursorHidden(False)
             self.win.requestProperties(self.pantalla)
             self.taskMgr.remove('actualizar')
+            self.gestor_nivel.mutear_zombies()
             self.menu_pausa.mostrar_menu()
             self.estado = ESTADO['PAUSA']
             
@@ -243,6 +246,29 @@ class Juego(ShowBase):
     def salir(self):
         self.userExit()
 
+    def cargar_pantalla_de_carga(self):
+        self.task_mgr.remove('actualizar')
+        self.menu_fondo = DirectFrame(frameColor = (0, 0, 0, 1), frameSize = (-1, 1, -1, 1), parent = juego.render2d)
+
+        self.pantalla_carga = DirectFrame(frameColor = (1, 1, 1, 1), parent = self.render2d)
+        texto_obj = TextNode('texto')
+        texto_obj.setText(self.niveles[self.nivel]['nivel'])
+        texto_node = self.render2d.attachNewNode(texto_obj)
+        texto_node.setScale(0.1)
+        texto_node.setPos(0, 0, 0.5) 
+        self.mensaje = texto_node
+        
+        self.taskMgr.doMethodLater(5.0, self.cargar_nivel, 'cargar-nivel')  
+
+    
+    def cargar_nivel(self, task):
+        self.pantalla_carga.destroy()
+        self.menu_fondo.destroy()
+        self.mensaje.removeNode()
+
+        self.task_mgr.add(self.actualizar, 'actualizar')
+        
+        return task.done
 
 juego = Juego()
 juego.run()
