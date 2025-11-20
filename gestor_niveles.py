@@ -200,6 +200,7 @@ class Nivel():
             self.juego.jugador.municion = self.juego.jugador.municion_maxima
             self.juego.jugador.cargador = 90
             self.gui.inicializar()
+            self.gui.esconder()
             self.gui.actualizar_balas(self.juego.jugador.municion, self.juego.jugador.cargador)
             self.cargar(self.juego.niveles[self.juego.nivel])
             self.juego.taskMgr.add(self.juego.actualizar, 'actualizar')

@@ -87,7 +87,7 @@ class Personaje():
         
         # COLISION (con NPCs y objetos)
         cn_jugador_obj = CollisionNode('personaje_obj')
-        cn_jugador_obj.addSolid(CollisionBox(Point3(0, 0.2, 1.5), 0.3, 0.3, 1))
+        cn_jugador_obj.addSolid(CollisionBox(Point3(0, 0.2, 1.5), 0.4, 0.4, 1))
         #cn_jugador_obj.addSolid(CollisionSphere(0, 0, 1, .3))
         self.colisionador_obj = self.personaje.attachNewNode(cn_jugador_obj)
         self.colisionador_obj.setPythonTag('owner', self)
